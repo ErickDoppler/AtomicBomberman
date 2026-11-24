@@ -194,7 +194,8 @@ class Translator:
         d, im = self.d, self.im
         entries = {im.entry}
         for a2, n2 in self.syms.items():
-            if n2 in ("_bm_entry", "bm_entry"): entries.add(a2)          # the original entry point of the patched game
+            if n2 in ("_bm_entry", "bm_entry"): entries.add(a2)
+            if 0x4b2f40 <= a2 < 0x4b32a4 and a2 in d: entries.add(a2)   # the asm glue the platform layer calls (bm_g_text ...)          # the original entry point of the patched game
         for a, i in d.items():
             if i["flow"] == "call" and i["target"] is not None:
                 entries.add(i["target"])

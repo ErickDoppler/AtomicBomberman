@@ -18,3 +18,7 @@
 *.pyc
 __pycache__/
 DedicatedServer/server.log
+
+# the game data and the built game of the Linux distribution
+distlinux86/source/DATA/
+distlinux86/atomicbomberman/

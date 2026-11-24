@@ -98,9 +98,14 @@ static void prof_dump(void) {
         prof_n[bi] = 0;
     }
 }
+int sys_thread(void (*fn)(void *), void *arg);
+void sys_sleep(unsigned ms);
+static volatile uint32_t cur_fn;
+static volatile int prof_run = 1;
+static void sampler(void *a) { (void)a; while (prof_run) { uint32_t c = cur_fn; if (c >= 0x401000 && c < 0x458000) prof_n[c - 0x401000]++; sys_sleep(0); } }
 void x2c_enter(uint32_t va) {
     static int reg;
-    if (!reg) { reg = 1; atexit(prof_dump); }
-    if (va >= 0x401000 && va < 0x458000) prof_n[va - 0x401000]++;
+    if (!reg) { reg = 1; atexit(prof_dump); sys_thread(sampler, 0); }
+    cur_fn = va;
 }
 #endif

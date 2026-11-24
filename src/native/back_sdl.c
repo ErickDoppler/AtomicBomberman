@@ -62,7 +62,27 @@ static int vw = 640, vh = 480, full;
 static uint32_t *rgb;
 static void (*audio_fill)(int16_t *, int);
 
+/* test aid, as in back_null.c: BM_KEYS=<frame>:<scancode hex>[u],...  and BM_QUIT_AT=<frame> */
+static unsigned frame_n;
+static struct { unsigned at; int key, up; } script[256];
+static int nscript, next_script, quit_sent;
+static unsigned quit_at;
+static void parse_script(void) {
+    const char *k = getenv("BM_KEYS"), *q = getenv("BM_QUIT_AT");
+    if (q) quit_at = (unsigned)atoi(q);
+    while (k && *k && nscript < 256) {
+        char *e; unsigned at = (unsigned)strtoul(k, &e, 10); int key, up = 0;
+        if (*e != ':') break;
+        key = (int)strtoul(e + 1, &e, 16);
+        if (*e == 'u') { up = 1; e++; }
+        script[nscript].at = at; script[nscript].key = key; script[nscript].up = up; nscript++;
+        k = *e == ',' ? e + 1 : e;
+        if (!*e) break;
+    }
+}
+
 int back_init(void) {
+    parse_script();
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
         if (SDL_Init(SDL_INIT_VIDEO) != 0) { fprintf(stderr, "SDL: %s\n", SDL_GetError()); return -1; }   /* no sound device is not fatal */
     }
@@ -82,7 +102,7 @@ void back_set_mode(int w, int h) {
     if (!win) {
         win = SDL_CreateWindow("Atomic Bomberman", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, w * scale, h * scale, SDL_WINDOW_SHOWN);
         if (!win) { fprintf(stderr, "SDL: %s\n", SDL_GetError()); exit(1); }
-        ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_PRESENTVSYNC);
+        ren = SDL_CreateRenderer(win, -1, getenv("BM_VSYNC") ? SDL_RENDERER_PRESENTVSYNC : 0);
         if (!ren) ren = SDL_CreateRenderer(win, -1, 0);
         if (!ren) { fprintf(stderr, "SDL: %s\n", SDL_GetError()); exit(1); }
         SDL_RenderSetLogicalSize(ren, w, h);                          /* keeps the 4:3 shape, black bars around */
@@ -95,6 +115,7 @@ void back_set_mode(int w, int h) {
 
 void back_present(const uint8_t *pix, const uint32_t *pal, int w, int h) {
     int n = w * h, i;
+    frame_n++;
     if (!tex || !rgb) return;
     for (i = 0; i < n; i++) rgb[i] = 0xFF000000u | pal[pix[i]];
     SDL_UpdateTexture(tex, 0, rgb, w * 4);
@@ -128,6 +149,11 @@ static int dik_of(int sc) {
 
 int back_poll(back_event_t *e) {
     SDL_Event ev;
+    if (next_script < nscript && script[next_script].at <= frame_n) {
+        e->type = script[next_script].up ? BE_KEY_UP : BE_KEY_DOWN; e->a = script[next_script].key; next_script++;
+        return 1;
+    }
+    if (quit_at && frame_n >= quit_at && !quit_sent) { quit_sent = 1; e->type = BE_QUIT; e->a = 0; return 1; }
     while (SDL_PollEvent(&ev)) {
         if (ev.type == EV_QUIT) { e->type = BE_QUIT; e->a = 0; return 1; }
         if (ev.type == EV_KEYDOWN || ev.type == EV_KEYUP) {

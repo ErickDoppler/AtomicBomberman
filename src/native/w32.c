@@ -441,7 +441,7 @@ static unsigned w_inet_addr(const char *t) {
 static unsigned short w_htons(unsigned short v) { return bs16(v); }
 static int w_gethostname(char *name, int n) { snprintf(name, (size_t)n, "localhost"); return 0; }
 /* gethostbyname: net.c reads the address list through "hostent + 12" (the Win32 layout), so the structure is built to match */
-static struct { char pad[12]; unsigned char **list; } he_;
+static struct { char pad[12]; unsigned char **list; } __attribute__((packed)) he_;      /* the list pointer sits at offset 12 as in the Win32 hostent */
 static unsigned char he_addrs[16][4]; static unsigned char *he_list[17];
 static void *w_gethostbyname(const char *name) {
     uint32_t a[16]; int n = 0, i;
@@ -496,7 +496,8 @@ void w32_init(void) {
 #ifdef _WIN32
     if (!_fullpath(exe_path, host_argv[0], sizeof exe_path)) snprintf(exe_path, sizeof exe_path, "%s", host_argv[0]);
 #else
-    if (!realpath(host_argv[0], exe_path)) snprintf(exe_path, sizeof exe_path, "%s", host_argv[0]);
+    {   char rp[4096];                                              /* realpath needs a PATH_MAX buffer (fortified libc checks it) */
+        if (realpath(host_argv[0], rp)) snprintf(exe_path, sizeof exe_path, "%s", rp); else snprintf(exe_path, sizeof exe_path, "%s", host_argv[0]); }
 #endif
 #ifndef _WIN32
     {   char tmp[1024]; size_t i, n = strlen(exe_path); tmp[0] = 'Z'; tmp[1] = ':'; memcpy(tmp + 2, exe_path, n + 1);
