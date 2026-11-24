@@ -205,7 +205,7 @@ class Translator:
                 entries.add(v)
         # a pointer-sized immediate that is a code address (mov eax, offset f) in live code counts too
         for a, i in d.items():
-            if i["imm_off"] is not None and i["imm_size"] == 4 and (a + i["imm_off"]) in im.relocs:
+            if i["imm_off"] is not None and i["imm_size"] == 4 and ((a + i["imm_off"]) in im.relocs or i["mn"] in ("mov", "push")):      # patched code has immediates without relocation entries
                 v = im.u32(a + i["imm_off"])
                 if v is not None and v in d:
                     entries.add(v)
@@ -394,6 +394,13 @@ class Translator:
         flow = i["flow"]
         # ---- control flow
         if flow == "call":
+            # "call f" where f is "pop reg; ret": the callee takes the return address for itself (a pointer to the data that follows
+            # the call) and then returns to the caller's caller - the C call stack cannot follow that, so it is done here
+            t1 = self.d.get(tgt)
+            if t1 and t1["mn"] == "pop" and t1["ops"] in R32 and self.d.get(tgt + t1["size"], {}).get("mn") == "ret":
+                r2 = self.d[tgt + t1["size"]]
+                n = parse_int(r2["ops"]) if r2["ops"] else 0
+                return "%s = 0x%x; esp += %d; return;" % (t1["ops"], nxt, 4 + n)
             return "PUSH32(0x%x); %s;" % (nxt, ("%s()" % self.names[tgt]) if tgt in self.names else "x2c_call(0x%x)" % tgt)
         if flow == "calli":
             return "{ uint32_t t_ = %s; PUSH32(0x%x); x2c_call(t_); }" % (rd(parse_op(ol[0], 4), 4), nxt)
@@ -485,6 +492,12 @@ class Translator:
         if mn in ("popal", "popa"): return "{ edi = POP32(); esi = POP32(); ebp = POP32(); (void)POP32(); ebx = POP32(); edx = POP32(); ecx = POP32(); eax = POP32(); }"
         if mn == "popfd": return "x2c_setflags(POP32());"
         if mn == "leave": return "esp = ebp; ebp = POP32();"
+        if mn == "aam":
+            n = parse_int(ol[0]) if ol else 10
+            return "{ uint8_t a_ = (uint8_t)eax, q_ = (uint8_t)(a_ / %d), r_ = (uint8_t)(a_ %% %d); eax = (eax & 0xffff0000u) | ((uint32_t)q_ << 8) | r_; zf = r_ == 0; sf = (int8_t)r_ < 0; pf = x2c_parity(r_); }" % (n, n)
+        if mn == "aad":
+            n = parse_int(ol[0]) if ol else 10
+            return "{ uint8_t r_ = (uint8_t)(((eax >> 8) & 0xff) * %d + (eax & 0xff)); eax = (eax & 0xffff0000u) | r_; zf = r_ == 0; sf = (int8_t)r_ < 0; pf = x2c_parity(r_); }" % n
         if mn == "enter": return "PUSH32(ebp); ebp = esp; esp -= %d;" % parse_int(ol[0])          # enter n, 0
         if mn == "xchg":
             return "{ %s t_ = %s; %s %s }" % (CTYPE[S], rd(o[0], S), wr(o[0], rd(o[1], S), S), wr(o[1], "t_", S))

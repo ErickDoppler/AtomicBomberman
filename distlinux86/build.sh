@@ -6,7 +6,7 @@
 #     atomicbomberman/DATA/                  everything the game needs
 #
 # Needs: a C compiler (gcc or clang) and the SDL2 library (libsdl2-2.0-0 - it is part of every desktop; the development package
-# is not required).  Everything else comes with the game: the Ogg Vorbis decoder (source/libs, installed into atomicbomberman/lib)
+# is not required).  Everything else comes with the game: the Ogg Vorbis decoder (source/libs, installed into atomicbomberman/DATA/lib)
 # and all game data.  The build needs about 1 GB of free memory.
 #
 #     Debian / Ubuntu / Raspberry Pi OS:  sudo apt install gcc libsdl2-2.0-0
@@ -43,7 +43,7 @@ BUNDLED=
 if [ -f "$SRC/libs/$ARCH/libvorbisfile.so.3" ]; then
   BUNDLED=$SRC/libs/$ARCH
   VORBIS=$BUNDLED/libvorbisfile.so.3
-  LIBS="$LIBS -Wl,-rpath-link,$BUNDLED -Wl,-rpath,\$ORIGIN/lib"
+  LIBS="$LIBS -Wl,-rpath-link,$BUNDLED -Wl,--disable-new-dtags -Wl,-rpath,\$ORIGIN/DATA/lib"
 else
   VORBIS=$(ls /usr/lib/*/libvorbisfile.so.3 /usr/lib64/libvorbisfile.so.3 /usr/lib/libvorbisfile.so.3 /usr/local/lib/libvorbisfile.so.3 2>/dev/null | head -1)
 fi
@@ -83,15 +83,15 @@ mkdir -p "$OUT"
 $CC -o "$OUT/AtomicBomberman" $OBJS $LIBS
 
 # --- the game folder -----------------------------------------------------------------------------------------------------
-[ -n "$BUNDLED" ] && { mkdir -p "$OUT/lib" && cp "$BUNDLED"/*.so* "$OUT/lib/"; }
 echo "Copying the game data ..."
 cp -r "$SRC/DATA" "$OUT/DATA"
 rm -f "$OUT"/DATA/*.dll "$OUT"/DATA/*.DLL
+[ -n "$BUNDLED" ] && { mkdir -p "$OUT/DATA/lib" && cp "$BUNDLED"/*.so* "$OUT/DATA/lib/"; }
 cat > "$OUT/AtomicBomberman.sh" <<'LEOF'
 #!/bin/sh
 # Starts Atomic Bomberman.  Options: -local (no network), -host <port>, -join <address:port>, -intro.
 cd "$(dirname "$(readlink -f "$0")")" || exit 1
-export LD_LIBRARY_PATH="$PWD/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"      # the Ogg Vorbis decoder that comes with the game
+export LD_LIBRARY_PATH="$PWD/DATA/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"      # the Ogg Vorbis decoder that comes with the game
 # without a desktop (the Linux console) SDL draws straight to the screen through KMS/DRM
 if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && [ -z "$SDL_VIDEODRIVER" ]; then
   export SDL_VIDEODRIVER=kmsdrm

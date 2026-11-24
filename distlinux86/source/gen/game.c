@@ -89,6 +89,7 @@ void f_00405bba(void);
 void f_00405ced(void);
 void f_00405d0c(void);
 void f_00405d7e(void);
+void f_00405dcf(void);
 void f_00405de3(void);
 void f_00406086(void);
 void f_0040614a(void);
@@ -229,6 +230,15 @@ void f_0040df41(void);
 void f_0040df95(void);
 void f_0040e03d(void);
 void f_0040e0b2(void);
+void f_0040e0f2(void);
+void f_0040e143(void);
+void f_0040e21a(void);
+void f_0040e25c(void);
+void f_0040e29e(void);
+void f_0040e2d8(void);
+void f_0040e312(void);
+void f_0040e38d(void);
+void f_0040e3c7(void);
 void f_0040e3ea(void);
 void f_0040e412(void);
 void f_0040e474(void);
@@ -583,6 +593,8 @@ void f_00422552(void);
 void f_004225be(void);
 void f_00422602(void);
 void f_00422646(void);
+void f_00422693(void);
+void f_004226f6(void);
 void f_00422718(void);
 void f_0042288c(void);
 void f_004228c4(void);
@@ -613,10 +625,13 @@ void f_004245b9(void);
 void f_004245da(void);
 void f_0042464b(void);
 void f_00424708(void);
+void f_0042475f(void);
 void f_004247c5(void);
 void f_00424841(void);
+void f_00424864(void);
 void f_004248c6(void);
 void f_00424987(void);
+void f_004249ea(void);
 void f_00424a50(void);
 void f_00424af4(void);
 void f_00424b41(void);
@@ -1207,6 +1222,8 @@ void f_0044b3c0(void);
 void f_0044b3d0(void);
 void f_0044b3e0(void);
 void f_0044b3f0(void);
+void f_0044b458(void);
+void f_0044b478(void);
 void f_0044b4a0(void);
 void f_0044b4b4(void);
 void f_0044b688(void);
@@ -1431,6 +1448,7 @@ void f_0044fbe4(void);
 void f_0044fccc(void);
 void f_0044fd00(void);
 void f_0044fd40(void);
+void f_0044ffbb(void);
 void f_0044ffe0(void);
 void f_0045002a(void);
 void f_00450050(void);
@@ -1463,6 +1481,7 @@ void f_00450f4a(void);
 void f_00450fab(void);
 void f_0045101e(void);
 void f_00451036(void);
+void f_0045103b(void);
 void f_00451060(void);
 void f_004510aa(void);
 void f_004510c5(void);
@@ -10742,6 +10761,234 @@ L_00405daf:;
     wr32((uint32_t)(0 + eax), 0x0u);
     goto L_00405da7;
 L_00405dc6:;
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); edx = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
+void f_00405dcf(void) {
+    X2C_ENTER(0x00405dcf);
+L_00405dcf:;
+    { uint32_t sp_ = esp; PUSH32(eax); PUSH32(ecx); PUSH32(edx); PUSH32(ebx); PUSH32(sp_); PUSH32(ebp); PUSH32(esi); PUSH32(edi); }
+    { uint8_t t_ = rd8((uint32_t)(0 + ebp)); wr8((uint32_t)(0 + ebp), (eax & 0xff)); eax = (eax & 0xffffff00u) | ((t_) & 0xff); }
+    { uint8_t t_ = rd8((uint32_t)(0 + ebp)); wr8((uint32_t)(0 + ebp), (eax & 0xff)); eax = (eax & 0xffffff00u) | ((t_) & 0xff); }
+    { int64_t p_ = (int64_t)(int32_t)rd32((uint32_t)(0 + esi - 0x798effbb)) * (int64_t)(int32_t)0x45u; uint32_t r_ = (uint32_t)p_; eax = r_; }
+    { uint8_t a_ = rd8((uint32_t)(0 + edi - 0x7a)), b_ = ((edx >> 8) & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + edi - 0x7a), r_); }
+    { uint32_t a_ = ebp, r_ = (uint32_t)(a_ + 1); ebp = r_; }
+    { uint8_t a_ = rd8((uint32_t)(0 + ebx + 0x51)), b_ = (edx & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + ebx + 0x51), r_); }
+    PUSH32(edx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    edx = 0x4587a7u;
+    eax = rd32((uint32_t)(0 + 0x45b910));
+    PUSH32(0x405e00); f_004514fc();
+    wr32((uint32_t)(0 + ebp - 0x4), eax);
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x4)), b_ = 0x0u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if (zf) goto L_0040607d;
+    eax = 0x4587aau;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405e1c); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0x8u, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464998)));
+    eax = 0x4587c4u;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405e34); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464a7c)));
+    eax = 0x4587d0u;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405e4c); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464974)));
+    eax = 0x4587e5u;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405e64); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464930)));
+    eax = 0x4587fbu;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405e7c); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464964)));
+    eax = 0x45880eu;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405e94); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464ae8)));
+    eax = 0x45881cu;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405eac); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464940)));
+    eax = 0x45882du;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405ec4); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x46497c)));
+    eax = 0x458848u;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405edc); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x4648bc)));
+    eax = 0x458859u;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405ef4); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    eax = 0x4648c4u;
+    PUSH32(eax);
+    eax = 0x458865u;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405f0c); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464948)));
+    eax = 0x458878u;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405f24); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464968)));
+    eax = 0x458885u;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405f3c); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464990)));
+    eax = 0x45889au;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405f54); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464928)));
+    eax = 0x4588b3u;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405f6c); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x4648c0)));
+    eax = 0x4588cau;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405f84); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464970)));
+    eax = 0x4588e1u;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405f9c); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x46482c)));
+    eax = 0x4588efu;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405fb4); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x4648b8)));
+    eax = 0x4588fdu;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405fcc); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    eax = 0x464830u;
+    PUSH32(eax);
+    eax = 0x45890au;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405fe4); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464828)));
+    eax = 0x458918u;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x405ffc); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    PUSH32(rd32((uint32_t)(0 + 0x464824)));
+    eax = 0x458928u;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x406014); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0xc), 0x0u);
+L_0040601e:;
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0xc)), b_ = 0x2u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if ((sf != of)) goto L_0040602e;
+    goto L_00406075;
+L_00406026:;
+    eax = rd32((uint32_t)(0 + ebp - 0xc));
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0xc)), r_ = (uint32_t)(a_ + 1); zf = r_ == 0; sf = (int32_t)r_ < 0; of = (r_ == (uint32_t)((uint32_t)1 << 31)) ; pf = x2c_parity(r_); wr32((uint32_t)(0 + ebp - 0xc), r_); }
+    goto L_0040601e;
+L_0040602e:;
+    wr32((uint32_t)(0 + ebp - 0x8), 0x0u);
+L_00406035:;
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x8)), b_ = 0xau, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if ((sf != of)) goto L_00406045;
+    goto L_00406073;
+L_0040603d:;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x8)), r_ = (uint32_t)(a_ + 1); zf = r_ == 0; sf = (int32_t)r_ < 0; of = (r_ == (uint32_t)((uint32_t)1 << 31)) ; pf = x2c_parity(r_); wr32((uint32_t)(0 + ebp - 0x8), r_); }
+    goto L_00406035;
+L_00406045:;
+    { int64_t p_ = (int64_t)(int32_t)rd32((uint32_t)(0 + ebp - 0xc)) * (int64_t)(int32_t)0x28u; uint32_t r_ = (uint32_t)p_; eax = r_; }
+    edx = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = edx; unsigned n_ = (0x2 & 31); uint32_t r_ = (uint32_t)(a_ << n_); edx = r_; }
+    { uint32_t a_ = eax, b_ = edx, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    PUSH32(rd32((uint32_t)(0 + eax + 0x4645bc)));
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0xc));
+    PUSH32(eax);
+    eax = 0x458938u;
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    PUSH32(0x40606e); f_00451b3e();
+    { uint32_t a_ = esp, b_ = 0x14u, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); cf = (uint64_t)a_ + b_ + c_ > 0xffffffffull; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ r_) & (b_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); esp = r_; }
+    goto L_0040603d;
+L_00406073:;
+    goto L_00406026;
+L_00406075:;
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(0x40607d); f_0045172e();
+L_0040607d:;
     esp = ebp;
     { uint32_t v_ = POP32(); ebp = v_; }
     { uint32_t v_ = POP32(); edi = v_; }
@@ -23972,6 +24219,377 @@ L_0040e0b2:;
     eax = (uint32_t)(int32_t)(int16_t)(rd16((uint32_t)(0 + eax)));
     PUSH32(0x40e0e9); f_00422646();
 L_0040e0e9:;
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); edx = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
+void f_0040e0f2(void) {
+    X2C_ENTER(0x0040e0f2);
+L_0040e0f2:;
+    PUSH32(ebx);
+    PUSH32(ecx);
+    PUSH32(edx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0x8u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0x8), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    PUSH32(0x40e10b); f_0040c497();
+    { uint32_t r_ = (uint32_t)(eax & eax); cf = 0; of = 0; zf = r_ == 0; sf = (int32_t)r_ < 0; pf = x2c_parity(r_); }
+    if (zf) goto L_0040e13a;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = eax, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    wr32((uint32_t)(0 + ebp - 0x4), eax);
+    ecx = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = ecx, b_ = 0x6u, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); ecx = r_; }
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    ebx = rd32((uint32_t)(0 + eax + 0x2));
+    { uint32_t a_ = ebx; unsigned n_ = (0x10 & 31); uint32_t r_ = (uint32_t)((int32_t)a_ >> n_); ebx = r_; }
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    edx = rd32((uint32_t)(0 + eax));
+    { uint32_t a_ = edx; unsigned n_ = (0x10 & 31); uint32_t r_ = (uint32_t)((int32_t)a_ >> n_); edx = r_; }
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    eax = (uint32_t)(int32_t)(int16_t)(rd16((uint32_t)(0 + eax)));
+    PUSH32(0x40e13a); f_00422693();
+L_0040e13a:;
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); edx = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
+void f_0040e143(void) {
+    X2C_ENTER(0x0040e143);
+L_0040e143:;
+    PUSH32(ebx);
+    PUSH32(ecx);
+    PUSH32(edx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0xc), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0xc));
+    PUSH32(0x40e15c); f_0040c497();
+    { uint32_t r_ = (uint32_t)(eax & eax); cf = 0; of = 0; zf = r_ == 0; sf = (int32_t)r_ < 0; pf = x2c_parity(r_); }
+    if (zf) goto L_0040e211;
+    { uint32_t a_ = rd32((uint32_t)(0 + 0x460058)), b_ = 0x1u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if (!zf) goto L_0040e211;
+    eax = rd32((uint32_t)(0 + ebp - 0xc));
+    { uint32_t a_ = eax, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    wr32((uint32_t)(0 + ebp - 0x8), eax);
+    eax = 0x458d8du;
+    PUSH32(eax);
+    PUSH32(0x40e185); f_0042c0c8();
+    { uint32_t a_ = esp, b_ = 0x4u, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0x4), 0x0u);
+L_0040e18f:;
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x4)), b_ = 0xau, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if ((sf != of)) goto L_0040e19f;
+    goto L_0040e203;
+L_0040e197:;
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x4)), r_ = (uint32_t)(a_ + 1); zf = r_ == 0; sf = (int32_t)r_ < 0; of = (r_ == (uint32_t)((uint32_t)1 << 31)) ; pf = x2c_parity(r_); wr32((uint32_t)(0 + ebp - 0x4), r_); }
+    goto L_0040e18f;
+L_0040e19f:;
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = eax, b_ = eax, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    { uint32_t a_ = eax, b_ = eax, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    { uint32_t a_ = eax, b_ = rd32((uint32_t)(0 + ebp - 0x8)), c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    eax = rd32((uint32_t)(0 + eax));
+    { uint32_t a_ = eax; unsigned n_ = (0x10 & 31); uint32_t r_ = (uint32_t)((int32_t)a_ >> n_); eax = r_; }
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = eax; unsigned n_ = (0x2 & 31); uint32_t r_ = (uint32_t)(a_ << n_); eax = r_; }
+    { uint32_t a_ = eax, b_ = rd32((uint32_t)(0 + ebp - 0x8)), c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    eax = (uint32_t)(int32_t)(int16_t)(rd16((uint32_t)(0 + eax)));
+    PUSH32(eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    PUSH32(eax);
+    eax = 0x458da0u;
+    PUSH32(eax);
+    PUSH32(0x40e1cb); f_0042c0c8();
+    { uint32_t a_ = esp, b_ = 0x10u, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = eax; unsigned n_ = (0x2 & 31); uint32_t r_ = (uint32_t)(a_ << n_); eax = r_; }
+    { uint32_t a_ = eax, b_ = rd32((uint32_t)(0 + ebp - 0x8)), c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    edx = (uint32_t)(int32_t)(int16_t)(rd16((uint32_t)(0 + eax)));
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = eax; unsigned n_ = (0x2 & 31); uint32_t r_ = (uint32_t)(a_ << n_); eax = r_; }
+    wr32((uint32_t)(0 + eax + 0x46460c), edx);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = eax, b_ = eax, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    { uint32_t a_ = eax, b_ = eax, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    { uint32_t a_ = eax, b_ = rd32((uint32_t)(0 + ebp - 0x8)), c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    edx = rd32((uint32_t)(0 + eax));
+    { uint32_t a_ = edx; unsigned n_ = (0x10 & 31); uint32_t r_ = (uint32_t)((int32_t)a_ >> n_); edx = r_; }
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = eax; unsigned n_ = (0x2 & 31); uint32_t r_ = (uint32_t)(a_ << n_); cf = n_ ? (a_ >> (32 - n_)) & 1 : cf; zf = r_ == 0; sf = (int32_t)r_ < 0; of = ((r_ >> 31) & 1) ^ cf; pf = x2c_parity(r_); eax = r_; }
+    wr32((uint32_t)(0 + eax + 0x46465c), edx);
+    goto L_0040e197;
+L_0040e203:;
+    eax = 0x458d19u;
+    PUSH32(eax);
+    PUSH32(0x40e20e); f_0042c0c8();
+    { uint32_t a_ = esp, b_ = 0x4u, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); esp = r_; }
+L_0040e211:;
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); edx = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
+void f_0040e21a(void) {
+    X2C_ENTER(0x0040e21a);
+L_0040e21a:;
+    PUSH32(ebx);
+    PUSH32(ecx);
+    PUSH32(edx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0x8u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0x8), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    PUSH32(0x40e233); f_0040c497();
+    { uint32_t r_ = (uint32_t)(eax & eax); cf = 0; of = 0; zf = r_ == 0; sf = (int32_t)r_ < 0; pf = x2c_parity(r_); }
+    if (zf) goto L_0040e253;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = eax, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    wr32((uint32_t)(0 + ebp - 0x4), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    edx = rd32((uint32_t)(0 + eax));
+    { uint32_t a_ = edx; unsigned n_ = (0x10 & 31); uint32_t r_ = (uint32_t)((int32_t)a_ >> n_); edx = r_; }
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    eax = (uint32_t)(int32_t)(int16_t)(rd16((uint32_t)(0 + eax)));
+    PUSH32(0x40e253); f_004249ea();
+L_0040e253:;
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); edx = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
+void f_0040e25c(void) {
+    X2C_ENTER(0x0040e25c);
+L_0040e25c:;
+    PUSH32(ebx);
+    PUSH32(ecx);
+    PUSH32(edx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0x8u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0x8), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    PUSH32(0x40e275); f_0040c497();
+    { uint32_t r_ = (uint32_t)(eax & eax); cf = 0; of = 0; zf = r_ == 0; sf = (int32_t)r_ < 0; pf = x2c_parity(r_); }
+    if (zf) goto L_0040e295;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = eax, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    wr32((uint32_t)(0 + ebp - 0x4), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    edx = rd32((uint32_t)(0 + eax));
+    { uint32_t a_ = edx; unsigned n_ = (0x10 & 31); uint32_t r_ = (uint32_t)((int32_t)a_ >> n_); edx = r_; }
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    eax = (uint32_t)(int32_t)(int16_t)(rd16((uint32_t)(0 + eax)));
+    PUSH32(0x40e295); f_0042475f();
+L_0040e295:;
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); edx = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
+void f_0040e29e(void) {
+    X2C_ENTER(0x0040e29e);
+L_0040e29e:;
+    PUSH32(ebx);
+    PUSH32(ecx);
+    PUSH32(edx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0x8u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0x8), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    PUSH32(0x40e2b7); f_0040c497();
+    { uint32_t r_ = (uint32_t)(eax & eax); cf = 0; of = 0; zf = r_ == 0; sf = (int32_t)r_ < 0; pf = x2c_parity(r_); }
+    if (zf) goto L_0040e2cf;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = eax, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    wr32((uint32_t)(0 + ebp - 0x4), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    eax = (uint32_t)(int32_t)(int16_t)(rd16((uint32_t)(0 + eax)));
+    wr32((uint32_t)(0 + 0x46499c), eax);
+L_0040e2cf:;
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); edx = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
+void f_0040e2d8(void) {
+    X2C_ENTER(0x0040e2d8);
+L_0040e2d8:;
+    PUSH32(ebx);
+    PUSH32(ecx);
+    PUSH32(edx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0x8u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0x8), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    PUSH32(0x40e2f1); f_0040c497();
+    { uint32_t r_ = (uint32_t)(eax & eax); cf = 0; of = 0; zf = r_ == 0; sf = (int32_t)r_ < 0; pf = x2c_parity(r_); }
+    if (zf) goto L_0040e309;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = eax, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    wr32((uint32_t)(0 + ebp - 0x4), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    eax = (uint32_t)(int32_t)(int16_t)(rd16((uint32_t)(0 + eax)));
+    PUSH32(0x40e309); f_004226f6();
+L_0040e309:;
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); edx = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
+void f_0040e312(void) {
+    X2C_ENTER(0x0040e312);
+L_0040e312:;
+    PUSH32(ebx);
+    PUSH32(ecx);
+    PUSH32(edx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0xc), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0xc));
+    PUSH32(0x40e32b); f_0040c497();
+    { uint32_t r_ = (uint32_t)(eax & eax); cf = 0; of = 0; zf = r_ == 0; sf = (int32_t)r_ < 0; pf = x2c_parity(r_); }
+    if (zf) goto L_0040e384;
+    eax = rd32((uint32_t)(0 + ebp - 0xc));
+    { uint32_t a_ = eax, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    wr32((uint32_t)(0 + ebp - 0x8), eax);
+    wr32((uint32_t)(0 + 0x464954), 0x1u);
+    wr32((uint32_t)(0 + ebp - 0x4), 0x0u);
+L_0040e349:;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    eax = (uint32_t)(int32_t)(int16_t)(rd16((uint32_t)(0 + eax)));
+    { uint32_t a_ = eax, b_ = rd32((uint32_t)(0 + ebp - 0x4)), c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if ((!zf && sf == of)) goto L_0040e35e;
+    goto L_0040e384;
+L_0040e356:;
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x4)), r_ = (uint32_t)(a_ + 1); zf = r_ == 0; sf = (int32_t)r_ < 0; of = (r_ == (uint32_t)((uint32_t)1 << 31)) ; pf = x2c_parity(r_); wr32((uint32_t)(0 + ebp - 0x4), r_); }
+    goto L_0040e349;
+L_0040e35e:;
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = eax, b_ = eax, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    { uint32_t a_ = eax, b_ = eax, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    { uint32_t a_ = eax, b_ = rd32((uint32_t)(0 + ebp - 0x8)), c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    edx = rd32((uint32_t)(0 + eax + 0x2));
+    { uint32_t a_ = edx; unsigned n_ = (0x10 & 31); uint32_t r_ = (uint32_t)((int32_t)a_ >> n_); edx = r_; }
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = eax, b_ = eax, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    { uint32_t a_ = eax, b_ = eax, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    { uint32_t a_ = eax, b_ = rd32((uint32_t)(0 + ebp - 0x8)), c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    eax = rd32((uint32_t)(0 + eax));
+    { uint32_t a_ = eax; unsigned n_ = (0x10 & 31); uint32_t r_ = (uint32_t)((int32_t)a_ >> n_); eax = r_; }
+    PUSH32(0x40e382); f_004121bf();
+    goto L_0040e356;
+L_0040e384:;
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); edx = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
+void f_0040e38d(void) {
+    X2C_ENTER(0x0040e38d);
+L_0040e38d:;
+    PUSH32(ebx);
+    PUSH32(ecx);
+    PUSH32(edx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0x8u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0x8), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    PUSH32(0x40e3a6); f_0040c497();
+    { uint32_t r_ = (uint32_t)(eax & eax); cf = 0; of = 0; zf = r_ == 0; sf = (int32_t)r_ < 0; pf = x2c_parity(r_); }
+    if (zf) goto L_0040e3be;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = eax, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    wr32((uint32_t)(0 + ebp - 0x4), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    eax = (uint32_t)(int32_t)(int16_t)(rd16((uint32_t)(0 + eax)));
+    PUSH32(0x40e3be); f_00424864();
+L_0040e3be:;
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); edx = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
+void f_0040e3c7(void) {
+    X2C_ENTER(0x0040e3c7);
+L_0040e3c7:;
+    PUSH32(ebx);
+    PUSH32(ecx);
+    PUSH32(edx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0x8u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0x8), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = eax, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    wr32((uint32_t)(0 + ebp - 0x4), eax);
     esp = ebp;
     { uint32_t v_ = POP32(); ebp = v_; }
     { uint32_t v_ = POP32(); edi = v_; }
@@ -56783,6 +57401,70 @@ L_0042268b:;
     { uint32_t v_ = POP32(); ebx = v_; }
     esp += 4; return;
 }
+void f_00422693(void) {
+    X2C_ENTER(0x00422693);
+L_00422693:;
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0x14u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0x14), eax);
+    wr32((uint32_t)(0 + ebp - 0x10), edx);
+    wr32((uint32_t)(0 + ebp - 0xc), ebx);
+    wr32((uint32_t)(0 + ebp - 0x8), ecx);
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x14)), b_ = 0x0u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if ((sf != of)) goto L_004226b6;
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x14)), b_ = 0xau, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if ((sf != of)) goto L_004226b8;
+L_004226b6:;
+    goto L_004226f0;
+L_004226b8:;
+    { int64_t p_ = (int64_t)(int32_t)rd32((uint32_t)(0 + ebp - 0x14)) * (int64_t)(int32_t)0x98u; uint32_t r_ = (uint32_t)p_; eax = r_; }
+    edx = 0x461bc4u;
+    { uint32_t a_ = edx, b_ = eax, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); edx = r_; }
+    wr32((uint32_t)(0 + ebp - 0x4), edx);
+    eax = rd32((uint32_t)(0 + ebp - 0x10));
+    edx = rd32((uint32_t)(0 + ebp - 0x4));
+    wr32((uint32_t)(0 + edx + 0x78), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0xc));
+    edx = rd32((uint32_t)(0 + ebp - 0x4));
+    wr32((uint32_t)(0 + edx + 0x7c), eax);
+    ebx = 0xeu;
+    edx = rd32((uint32_t)(0 + ebp - 0x8));
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = eax, b_ = 0x84u, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); eax = r_; }
+    PUSH32(0x4226f0); f_00451dc4();
+L_004226f0:;
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    esp += 4; return;
+}
+void f_004226f6(void) {
+    X2C_ENTER(0x004226f6);
+L_004226f6:;
+    PUSH32(ebx);
+    PUSH32(ecx);
+    PUSH32(edx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0x4u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0x4), eax);
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    wr32((uint32_t)(0 + 0x45be3c), eax);
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); edx = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
 void f_00422718(void) {
     X2C_ENTER(0x00422718);
 L_00422718:;
@@ -64323,6 +65005,54 @@ L_00424757:;
     { uint32_t v_ = POP32(); ebx = v_; }
     esp += 4; return;
 }
+void f_0042475f(void) {
+    X2C_ENTER(0x0042475f);
+L_0042475f:;
+    PUSH32(ebx);
+    PUSH32(ecx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0x10u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0x10), eax);
+    wr32((uint32_t)(0 + ebp - 0xc), edx);
+    wr32((uint32_t)(0 + ebp - 0x4), 0x0u);
+    eax = rd32((uint32_t)(0 + 0x46220c));
+    wr32((uint32_t)(0 + ebp - 0x8), eax);
+L_00424781:;
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x4)), b_ = 0x64u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if ((sf != of)) goto L_0042479b;
+    goto L_004247bd;
+L_00424789:;
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x4)), r_ = (uint32_t)(a_ + 1); wr32((uint32_t)(0 + ebp - 0x4), r_); }
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x8)), b_ = 0x98u, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); cf = (uint64_t)a_ + b_ + c_ > 0xffffffffull; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ r_) & (b_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); wr32((uint32_t)(0 + ebp - 0x8), r_); }
+    goto L_00424781;
+L_0042479b:;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = rd32((uint32_t)(0 + eax)), b_ = 0x0u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if (zf) goto L_004247bb;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    eax = rd32((uint32_t)(0 + eax + 0xc));
+    { uint32_t a_ = eax, b_ = rd32((uint32_t)(0 + ebp - 0x10)), c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if (!zf) goto L_004247bb;
+    edx = rd32((uint32_t)(0 + ebp - 0xc));
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    PUSH32(0x4247b9); f_0042464b();
+    goto L_004247bd;
+L_004247bb:;
+    goto L_00424789;
+L_004247bd:;
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
 void f_004247c5(void) {
     X2C_ENTER(0x004247c5);
 L_004247c5:;
@@ -64392,6 +65122,54 @@ L_00424841:;
     wr32((uint32_t)(0 + ebp - 0x4), eax);
     eax = rd32((uint32_t)(0 + ebp - 0x4));
     wr32((uint32_t)(0 + eax), 0x0u);
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); edx = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
+void f_00424864(void) {
+    X2C_ENTER(0x00424864);
+L_00424864:;
+    PUSH32(ebx);
+    PUSH32(ecx);
+    PUSH32(edx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0xcu, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0xc), eax);
+    wr32((uint32_t)(0 + ebp - 0x4), 0x0u);
+    eax = rd32((uint32_t)(0 + 0x46220c));
+    wr32((uint32_t)(0 + ebp - 0x8), eax);
+L_00424884:;
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x4)), b_ = 0x64u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if ((sf != of)) goto L_0042489e;
+    goto L_004248bd;
+L_0042488c:;
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x4)), r_ = (uint32_t)(a_ + 1); wr32((uint32_t)(0 + ebp - 0x4), r_); }
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x8)), b_ = 0x98u, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); cf = (uint64_t)a_ + b_ + c_ > 0xffffffffull; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ r_) & (b_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); wr32((uint32_t)(0 + ebp - 0x8), r_); }
+    goto L_00424884;
+L_0042489e:;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = rd32((uint32_t)(0 + eax)), b_ = 0x0u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if (zf) goto L_004248bb;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    eax = rd32((uint32_t)(0 + eax + 0xc));
+    { uint32_t a_ = eax, b_ = rd32((uint32_t)(0 + ebp - 0xc)), c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if (!zf) goto L_004248bb;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    PUSH32(0x4248b9); f_00424841();
+    goto L_004248bd;
+L_004248bb:;
+    goto L_0042488c;
+L_004248bd:;
     esp = ebp;
     { uint32_t v_ = POP32(); ebp = v_; }
     { uint32_t v_ = POP32(); edi = v_; }
@@ -64507,6 +65285,54 @@ L_004249d4:;
     eax = rd32((uint32_t)(0 + eax + 0xc));
     PUSH32(0x4249e2); f_0041013f();
 L_004249e2:;
+    esp = ebp;
+    { uint32_t v_ = POP32(); ebp = v_; }
+    { uint32_t v_ = POP32(); edi = v_; }
+    { uint32_t v_ = POP32(); esi = v_; }
+    { uint32_t v_ = POP32(); ecx = v_; }
+    { uint32_t v_ = POP32(); ebx = v_; }
+    esp += 4; return;
+}
+void f_004249ea(void) {
+    X2C_ENTER(0x004249ea);
+L_004249ea:;
+    PUSH32(ebx);
+    PUSH32(ecx);
+    PUSH32(esi);
+    PUSH32(edi);
+    PUSH32(ebp);
+    ebp = esp;
+    { uint32_t a_ = esp, b_ = 0x10u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); esp = r_; }
+    wr32((uint32_t)(0 + ebp - 0x10), eax);
+    wr32((uint32_t)(0 + ebp - 0xc), edx);
+    wr32((uint32_t)(0 + ebp - 0x4), 0x0u);
+    eax = rd32((uint32_t)(0 + 0x46220c));
+    wr32((uint32_t)(0 + ebp - 0x8), eax);
+L_00424a0c:;
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x4)), b_ = 0x64u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if ((sf != of)) goto L_00424a26;
+    goto L_00424a48;
+L_00424a14:;
+    eax = rd32((uint32_t)(0 + ebp - 0x4));
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x4)), r_ = (uint32_t)(a_ + 1); wr32((uint32_t)(0 + ebp - 0x4), r_); }
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = rd32((uint32_t)(0 + ebp - 0x8)), b_ = 0x98u, c_ = 0; uint32_t r_ = (uint32_t)(a_ + b_ + c_); cf = (uint64_t)a_ + b_ + c_ > 0xffffffffull; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ r_) & (b_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); wr32((uint32_t)(0 + ebp - 0x8), r_); }
+    goto L_00424a0c;
+L_00424a26:;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    { uint32_t a_ = rd32((uint32_t)(0 + eax)), b_ = 0x0u, c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if (zf) goto L_00424a46;
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    eax = rd32((uint32_t)(0 + eax + 0xc));
+    { uint32_t a_ = eax, b_ = rd32((uint32_t)(0 + ebp - 0x10)), c_ = 0; uint32_t r_ = (uint32_t)(a_ - b_ - c_); cf = (uint64_t)a_ < (uint64_t)b_ + c_; zf = r_ == 0; sf = (int32_t)r_ < 0; of = (((a_ ^ b_) & (a_ ^ r_)) >> 31) & 1; pf = x2c_parity(r_); }
+    if (!zf) goto L_00424a46;
+    edx = rd32((uint32_t)(0 + ebp - 0xc));
+    eax = rd32((uint32_t)(0 + ebp - 0x8));
+    PUSH32(0x424a44); f_004248c6();
+    goto L_00424a48;
+L_00424a46:;
+    goto L_00424a14;
+L_00424a48:;
     esp = ebp;
     { uint32_t v_ = POP32(); ebp = v_; }
     { uint32_t v_ = POP32(); edi = v_; }
@@ -114244,6 +115070,58 @@ L_0044b40c:;
     esp = ebp; ebp = POP32();
     esp += 4; return;
 }
+void f_0044b458(void) {
+    X2C_ENTER(0x0044b458);
+L_0044b458:;
+    { uint8_t a_ = rd8((uint32_t)(0 + eax)), b_ = (eax & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + eax), r_); }
+    { uint8_t a_ = rd8((uint32_t)(0 + eax)), b_ = (eax & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + eax), r_); }
+    eax = (eax & 0xffffff00u) | ((rd8((uint32_t)(0 + 0xb00044b2))) & 0xff);
+    edx = (edx & 0xffffff00u) | ((0x44u) & 0xff);
+    { uint8_t a_ = (eax & 0xff), b_ = (eax & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); eax = (eax & 0xffffff00u) | ((r_) & 0xff); }
+    edx = (edx & 0xffffff00u) | ((0x44u) & 0xff);
+    { uint8_t a_ = (eax & 0xff), b_ = (edx & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); eax = (eax & 0xffffff00u) | ((r_) & 0xff); }
+    edx = (edx & 0xffffff00u) | ((0x44u) & 0xff);
+    { uint8_t a_ = (eax & 0xff), b_ = ((eax >> 8) & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); eax = (eax & 0xffffff00u) | ((r_) & 0xff); }
+    edx = (edx & 0xffffff00u) | ((0x44u) & 0xff);
+    { uint8_t a_ = (eax & 0xff), b_ = ((edx >> 8) & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); eax = (eax & 0xffffff00u) | ((r_) & 0xff); }
+    edx = (edx & 0xffffff00u) | ((0x44u) & 0xff);
+    { uint8_t a_ = rd8((uint32_t)(0 + eax)), b_ = (eax & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + eax), r_); }
+    ebx = (ebx & 0xffffff00u) | ((0x44u) & 0xff);
+    { uint8_t a_ = rd8((uint32_t)(0 + eax)), b_ = (eax & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + eax), r_); }
+    { uint8_t a_ = rd8((uint32_t)(0 + eax)), b_ = (eax & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + eax), r_); }
+    { uint8_t a_ = rd8((uint32_t)(0 + eax - 0x4d)), b_ = (eax & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + eax - 0x4d), r_); }
+    { uint32_t a_ = esp, r_ = (uint32_t)(a_ + 1); esp = r_; }
+    { uint8_t a_ = rd8((uint32_t)(0 + eax - 0x4d)), b_ = ((eax >> 8) & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + eax - 0x4d), r_); }
+    { uint32_t a_ = esp, r_ = (uint32_t)(a_ + 1); esp = r_; }
+    { uint8_t a_ = rd8((uint32_t)(0 + eax - 0x5fffbb4d)), b_ = (eax & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + eax - 0x5fffbb4d), r_); }
+    ebx = (ebx & 0xffffff00u) | ((0x44u) & 0xff);
+    { uint8_t a_ = (eax & 0xff), b_ = (eax & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); eax = (eax & 0xffffff00u) | ((r_) & 0xff); }
+    ebx = (ebx & 0xffffff00u) | ((0x44u) & 0xff);
+    { uint8_t a_ = (eax & 0xff), b_ = (edx & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); eax = (eax & 0xffffff00u) | ((r_) & 0xff); }
+    ebx = (ebx & 0xffffff00u) | ((0x44u) & 0xff);
+    { uint8_t a_ = (eax & 0xff), b_ = ((eax >> 8) & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); eax = (eax & 0xffffff00u) | ((r_) & 0xff); }
+    ebx = (ebx & 0xffffff00u) | ((0x44u) & 0xff);
+    X2C_FELL(0x0044b497);
+}
+void f_0044b478(void) {
+    X2C_ENTER(0x0044b478);
+L_0044b478:;
+    { uint8_t a_ = rd8((uint32_t)(0 + eax)), b_ = (eax & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + eax), r_); }
+    { uint8_t a_ = rd8((uint32_t)(0 + eax)), b_ = (eax & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + eax), r_); }
+    { uint32_t a_ = eax, r_ = (uint32_t)(a_ + 1); eax = r_; }
+    ebx = (ebx & 0xffffff00u) | ((0x44u) & 0xff);
+    { uint8_t a_ = rd8((uint32_t)(0 + eax - 0x4d)), b_ = ((eax >> 8) & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + eax - 0x4d), r_); }
+    { uint32_t a_ = esp, r_ = (uint32_t)(a_ + 1); esp = r_; }
+    { uint8_t a_ = rd8((uint32_t)(0 + eax - 0x5fffbb4d)), b_ = (eax & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); wr8((uint32_t)(0 + eax - 0x5fffbb4d), r_); }
+    ebx = (ebx & 0xffffff00u) | ((0x44u) & 0xff);
+    { uint8_t a_ = (eax & 0xff), b_ = (eax & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); eax = (eax & 0xffffff00u) | ((r_) & 0xff); }
+    ebx = (ebx & 0xffffff00u) | ((0x44u) & 0xff);
+    { uint8_t a_ = (eax & 0xff), b_ = (edx & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); eax = (eax & 0xffffff00u) | ((r_) & 0xff); }
+    ebx = (ebx & 0xffffff00u) | ((0x44u) & 0xff);
+    { uint8_t a_ = (eax & 0xff), b_ = ((eax >> 8) & 0xff), c_ = 0; uint8_t r_ = (uint8_t)(a_ + b_ + c_); eax = (eax & 0xffffff00u) | ((r_) & 0xff); }
+    ebx = (ebx & 0xffffff00u) | ((0x44u) & 0xff);
+    X2C_FELL(0x0044b497);
+}
 void f_0044b4a0(void) {
     X2C_ENTER(0x0044b4a0);
 L_0044b4a0:;
@@ -122722,6 +123600,14 @@ L_0044fd40:;
     { uint32_t v_ = POP32(); ebx = v_; }
     esp += 4; return;
 }
+void f_0044ffbb(void) {
+    X2C_ENTER(0x0044ffbb);
+L_0044ffbb:;
+    { uint8_t r_ = (uint8_t)(rd8((uint32_t)(0 + ecx)) ^ ((edx >> 8) & 0xff)); wr8((uint32_t)(0 + ecx), r_); }
+    { uint8_t r_ = (uint8_t)(((edx >> 8) & 0xff) ^ rd8((uint32_t)(0 + ebx))); edx = (edx & 0xffff00ffu) | (((r_) & 0xff) << 8); }
+    { uint8_t r_ = (uint8_t)((eax & 0xff) ^ 0x35u); eax = (eax & 0xffffff00u) | ((r_) & 0xff); }
+    X2C_FELL(0x0044ffc1);
+}
 void f_0044ffe0(void) {
     X2C_ENTER(0x0044ffe0);
 L_0044ffe0:;
@@ -124464,6 +125350,14 @@ L_00451013:;
     goto L_00450ffe;
 L_00451036:;
     goto L_00450ff5;
+}
+void f_0045103b(void) {
+    X2C_ENTER(0x0045103b);
+L_0045103b:;
+    { uint8_t r_ = (uint8_t)(rd8((uint32_t)(0 + ecx)) ^ ((edx >> 8) & 0xff)); wr8((uint32_t)(0 + ecx), r_); }
+    { uint8_t r_ = (uint8_t)(((edx >> 8) & 0xff) ^ rd8((uint32_t)(0 + ebx))); edx = (edx & 0xffff00ffu) | (((r_) & 0xff) << 8); }
+    { uint8_t r_ = (uint8_t)((eax & 0xff) ^ 0x35u); eax = (eax & 0xffffff00u) | ((r_) & 0xff); }
+    X2C_FELL(0x00451041);
 }
 void f_00451060(void) {
     X2C_ENTER(0x00451060);
@@ -132720,7 +133614,10 @@ L_00456925:;
     { uint32_t d_ = (edx & 0xff); uint32_t n_ = eax & 0xffff; X2C_DIVCHK(d_); eax = (eax & 0xffff0000u) | ((uint8_t)(n_ / d_)) | (((uint8_t)(n_ % d_)) << 8); }
     edx = (edx & 0xffffff00u) | ((((eax >> 8) & 0xff)) & 0xff);
     eax = (eax & 0xffff00ffu) | (((0x0u) & 0xff) << 8);
-    X2C_FELL(0x00456934);
+    { uint8_t a_ = (uint8_t)eax, q_ = (uint8_t)(a_ / 10), r_ = (uint8_t)(a_ % 10); eax = (eax & 0xffff0000u) | ((uint32_t)q_ << 8) | r_; zf = r_ == 0; sf = (int8_t)r_ < 0; pf = x2c_parity(r_); }
+    { uint32_t t_ = edx; edx = eax; eax = t_; }
+    eax = (eax & 0xffff00ffu) | (((0x0u) & 0xff) << 8);
+    { uint8_t a_ = (uint8_t)eax, q_ = (uint8_t)(a_ / 10), r_ = (uint8_t)(a_ % 10); eax = (eax & 0xffff0000u) | ((uint32_t)q_ << 8) | r_; zf = r_ == 0; sf = (int8_t)r_ < 0; pf = x2c_parity(r_); }
 L_0045693b:;
     { uint16_t a_ = (eax & 0xffff), b_ = 0x3030u, c_ = 0; uint16_t r_ = (uint16_t)(a_ + b_ + c_); eax = (eax & 0xffff0000u) | ((r_) & 0xffff); }
     { uint16_t a_ = (edx & 0xffff), b_ = 0x3030u, c_ = 0; uint16_t r_ = (uint16_t)(a_ + b_ + c_); edx = (edx & 0xffff0000u) | ((r_) & 0xffff); }
@@ -132748,7 +133645,7 @@ L_0045695f:;
 void f_00456965(void) {
     X2C_ENTER(0x00456965);
 L_00456965:;
-    PUSH32(0x45696a); f_00456a1a();
+    edi = 0x45696a; esp += 4; return;
     X2C_FELL(0x0045696a);
 }
 void f_00456a1a(void) {

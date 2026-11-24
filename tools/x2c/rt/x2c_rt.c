@@ -71,7 +71,13 @@ void x2c_call(uint32_t target) {
     x2c_unimpl(target, "call to an address that is not a function");
 }
 void x2c_jump(uint32_t target) { x2c_call(target); }
-void x2c_unimpl(uint32_t at, const char *what) { fprintf(stderr, "x2c: %08x: %s\n", at, what); abort(); }
+void x2c_unimpl(uint32_t at, const char *what) {
+    uint32_t p; int n = 0;
+    fprintf(stderr, "x2c: %08x: %s\n  guest return addresses on the stack:", at, what);
+    for (p = esp; p < esp + 0x2000 && n < 24; p += 4) { uint32_t v = rd32(p); if (v >= 0x401000 && v < 0x458000) { fprintf(stderr, " %06x", v); n++; } }
+    fprintf(stderr, "\n");
+    abort();
+}
 void x2c_div0(void) { fprintf(stderr, "x2c: division by zero\n"); abort(); }
 
 #ifdef X2C_CALLS

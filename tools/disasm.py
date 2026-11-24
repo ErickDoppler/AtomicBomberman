@@ -66,6 +66,7 @@ class Dis:
         while self.work:
             a = self.work.popleft()
             while a not in insns and self.lo <= a < self.hi:
+                if os.environ.get("DIS_WATCH") and a == int(os.environ["DIS_WATCH"], 16): print("decode at watch", hex(a), "overlap-allowed", self.allow_overlap)
                 got = list(md.disasm(im.read(a, 16), a, 1))
                 if not got:
                     self.bad.append(a)
@@ -104,7 +105,7 @@ class Dis:
 
     def prune(self):
         """Drop 'code' that runs off the end of a function into data (junk opcodes, zero fill)."""
-        BANNED = ("in", "out", "insb", "insd", "outsb", "outsd", "lcall", "ljmp", "aam", "aad", "aaa", "aas", "daa", "das",
+        BANNED = ("in", "out", "insb", "insd", "outsb", "outsd", "lcall", "ljmp", "aaa", "aas", "daa", "das",
                   "salc", "arpl", "iretd", "iret", "sysenter", "syscall", "int", "into", "bound", "retf", "lret", "cli", "sti")
         entries = set(self.seeds)
         for d in self.insns.values():
@@ -148,7 +149,7 @@ class Dis:
         self.seed(start)
         self.run()
         self.allow_overlap = True
-        BANNED = ("in", "out", "insb", "insd", "outsb", "outsd", "lcall", "ljmp", "aam", "aad", "aaa", "aas", "daa", "das",
+        BANNED = ("in", "out", "insb", "insd", "outsb", "outsd", "lcall", "ljmp", "aaa", "aas", "daa", "das",
                   "salc", "arpl", "iretd", "iret", "sysenter", "syscall", "int", "into", "bound", "retf", "lret", "cli", "sti")
         junk = False
         for a2, d2 in self.insns.items():
@@ -245,13 +246,25 @@ def main():
             for off, sz in ((d["imm_off"], d["imm_size"]), (d["disp_off"], d["disp_size"])):
                 if off is not None and sz == 4 and (a + off) in im.relocs:
                     v = im.u32(a + off)
-                    if D.lo <= v < D.hi and not D.own[v - D.lo] and not (d["flow"] == "jmpi" and off == d["disp_off"]):     # a jump table base is data
+                    if D.lo <= v < D.hi and D.own[v - D.lo] in (0, 2) and not (d["flow"] == "jmpi" and off == d["disp_off"]):     # a jump table base is data
                         D.seed(v)
         D.run()
         if len(D.insns) == n0:
             break
     print("after recursion:", len(D.insns), "insns")
     D.fill_gaps()
+    for rnd in range(4):          # code found while probing gaps refers to more code (handlers stored by address): follow those too
+        n0 = len(D.insns)
+        for a, d in sorted(D.insns.items()):
+            for off, sz in ((d["imm_off"], d["imm_size"]), (d["disp_off"], d["disp_size"])):
+                if off is not None and sz == 4 and (a + off) in im.relocs:
+                    v = im.u32(a + off)
+                    if D.lo <= v < D.hi and D.own[v - D.lo] in (0, 2) and not (d["flow"] == "jmpi" and off == d["disp_off"]):
+                        D.seed(v)
+        D.run()
+        D.fill_gaps()
+        if len(D.insns) == n0:
+            break
     print("pruned", D.prune())
     insns = D.insns
     print("instructions", len(insns), "undecodable", len(D.bad), [hex(x) for x in D.bad[:10]])
@@ -260,7 +273,9 @@ def main():
     ks = sorted(insns)
     ov = [(a, b) for a, b in zip(ks, ks[1:]) if a + insns[a]["size"] > b]
     print("conflicts", len(D.conflicts), "tables", len(D.tables), "overlaps", len(ov), [(hex(a), hex(b)) for a, b in ov[:8]])
-    print("conflict addresses", [(hex(x), bytes(D.own[x - D.lo: x - D.lo + 8]).hex()) for x in D.conflicts], D.tables)
+    print("conflict addresses", [hex(x) for x in D.conflicts])
+    if os.environ.get("DIS_WATCH"):
+        w = int(os.environ["DIS_WATCH"], 16); print("watch", hex(w), "own", bytes(D.own[w - D.lo: w - D.lo + 4]).hex(), "tables", [(hex(a), n) for a, n in D.tables if a <= w < a + 4 * n], "seeded", w in D.seeds, "reloc732", 0x40e732 in im.relocs, "insn731", 0x40e731 in D.insns, len(im.relocs))
     gaps = gaps_of(insns, D.lo, D.hi)
     print("gaps", len(gaps), "bytes", sum(b - a for a, b in gaps))
     for g in sorted(gaps, key=lambda g: g[0] - g[1])[:12]:

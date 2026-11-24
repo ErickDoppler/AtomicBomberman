@@ -88,6 +88,7 @@ void f_00405bba(void);
 void f_00405ced(void);
 void f_00405d0c(void);
 void f_00405d7e(void);
+void f_00405dcf(void);
 void f_00405de3(void);
 void f_00406086(void);
 void f_0040614a(void);
@@ -228,6 +229,15 @@ void f_0040df41(void);
 void f_0040df95(void);
 void f_0040e03d(void);
 void f_0040e0b2(void);
+void f_0040e0f2(void);
+void f_0040e143(void);
+void f_0040e21a(void);
+void f_0040e25c(void);
+void f_0040e29e(void);
+void f_0040e2d8(void);
+void f_0040e312(void);
+void f_0040e38d(void);
+void f_0040e3c7(void);
 void f_0040e3ea(void);
 void f_0040e412(void);
 void f_0040e474(void);
@@ -582,6 +592,8 @@ void f_00422552(void);
 void f_004225be(void);
 void f_00422602(void);
 void f_00422646(void);
+void f_00422693(void);
+void f_004226f6(void);
 void f_00422718(void);
 void f_0042288c(void);
 void f_004228c4(void);
@@ -612,10 +624,13 @@ void f_004245b9(void);
 void f_004245da(void);
 void f_0042464b(void);
 void f_00424708(void);
+void f_0042475f(void);
 void f_004247c5(void);
 void f_00424841(void);
+void f_00424864(void);
 void f_004248c6(void);
 void f_00424987(void);
+void f_004249ea(void);
 void f_00424a50(void);
 void f_00424af4(void);
 void f_00424b41(void);
@@ -1206,6 +1221,8 @@ void f_0044b3c0(void);
 void f_0044b3d0(void);
 void f_0044b3e0(void);
 void f_0044b3f0(void);
+void f_0044b458(void);
+void f_0044b478(void);
 void f_0044b4a0(void);
 void f_0044b4b4(void);
 void f_0044b688(void);
@@ -1430,6 +1447,7 @@ void f_0044fbe4(void);
 void f_0044fccc(void);
 void f_0044fd00(void);
 void f_0044fd40(void);
+void f_0044ffbb(void);
 void f_0044ffe0(void);
 void f_0045002a(void);
 void f_00450050(void);
@@ -1462,6 +1480,7 @@ void f_00450f4a(void);
 void f_00450fab(void);
 void f_0045101e(void);
 void f_00451036(void);
+void f_0045103b(void);
 void f_00451060(void);
 void f_004510aa(void);
 void f_004510c5(void);
@@ -1790,6 +1809,7 @@ const x2c_fn_t x2c_ftab[] = {
     { 0x00405ced, f_00405ced },
     { 0x00405d0c, f_00405d0c },
     { 0x00405d7e, f_00405d7e },
+    { 0x00405dcf, f_00405dcf },
     { 0x00405de3, f_00405de3 },
     { 0x00406086, f_00406086 },
     { 0x0040614a, f_0040614a },
@@ -1930,6 +1950,15 @@ const x2c_fn_t x2c_ftab[] = {
     { 0x0040df95, f_0040df95 },
     { 0x0040e03d, f_0040e03d },
     { 0x0040e0b2, f_0040e0b2 },
+    { 0x0040e0f2, f_0040e0f2 },
+    { 0x0040e143, f_0040e143 },
+    { 0x0040e21a, f_0040e21a },
+    { 0x0040e25c, f_0040e25c },
+    { 0x0040e29e, f_0040e29e },
+    { 0x0040e2d8, f_0040e2d8 },
+    { 0x0040e312, f_0040e312 },
+    { 0x0040e38d, f_0040e38d },
+    { 0x0040e3c7, f_0040e3c7 },
     { 0x0040e3ea, f_0040e3ea },
     { 0x0040e412, f_0040e412 },
     { 0x0040e474, f_0040e474 },
@@ -2284,6 +2313,8 @@ const x2c_fn_t x2c_ftab[] = {
     { 0x004225be, f_004225be },
     { 0x00422602, f_00422602 },
     { 0x00422646, f_00422646 },
+    { 0x00422693, f_00422693 },
+    { 0x004226f6, f_004226f6 },
     { 0x00422718, f_00422718 },
     { 0x0042288c, f_0042288c },
     { 0x004228c4, f_004228c4 },
@@ -2314,10 +2345,13 @@ const x2c_fn_t x2c_ftab[] = {
     { 0x004245da, f_004245da },
     { 0x0042464b, f_0042464b },
     { 0x00424708, f_00424708 },
+    { 0x0042475f, f_0042475f },
     { 0x004247c5, f_004247c5 },
     { 0x00424841, f_00424841 },
+    { 0x00424864, f_00424864 },
     { 0x004248c6, f_004248c6 },
     { 0x00424987, f_00424987 },
+    { 0x004249ea, f_004249ea },
     { 0x00424a50, f_00424a50 },
     { 0x00424af4, f_00424af4 },
     { 0x00424b41, f_00424b41 },
@@ -2908,6 +2942,8 @@ const x2c_fn_t x2c_ftab[] = {
     { 0x0044b3d0, f_0044b3d0 },
     { 0x0044b3e0, f_0044b3e0 },
     { 0x0044b3f0, f_0044b3f0 },
+    { 0x0044b458, f_0044b458 },
+    { 0x0044b478, f_0044b478 },
     { 0x0044b4a0, f_0044b4a0 },
     { 0x0044b4b4, f_0044b4b4 },
     { 0x0044b688, f_0044b688 },
@@ -3132,6 +3168,7 @@ const x2c_fn_t x2c_ftab[] = {
     { 0x0044fccc, f_0044fccc },
     { 0x0044fd00, f_0044fd00 },
     { 0x0044fd40, f_0044fd40 },
+    { 0x0044ffbb, f_0044ffbb },
     { 0x0044ffe0, f_0044ffe0 },
     { 0x0045002a, f_0045002a },
     { 0x00450050, f_00450050 },
@@ -3164,6 +3201,7 @@ const x2c_fn_t x2c_ftab[] = {
     { 0x00450fab, f_00450fab },
     { 0x0045101e, f_0045101e },
     { 0x00451036, f_00451036 },
+    { 0x0045103b, f_0045103b },
     { 0x00451060, f_00451060 },
     { 0x004510aa, f_004510aa },
     { 0x004510c5, f_004510c5 },
@@ -3403,4 +3441,4 @@ const x2c_fn_t x2c_ftab[] = {
     { 0x004b3283, f_004b3283 },
     { 0x004b3290, f_004b3290 },
     { 0, 0 } };
-const unsigned x2c_nftab = 1701;
+const unsigned x2c_nftab = 1720;
