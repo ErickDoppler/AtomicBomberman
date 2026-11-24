@@ -171,3 +171,8 @@ DATA\                    everything else: graphics, sound, schemes (DATA\RES, AN
 ```
 The game still asks for those files in its own folder; `src/platform/vfs.c` (redir) maps a name that sits directly in
 the game folder to DATA\<name>, for reading, writing and searching.
+
+## Third-party software
+The release zip ships three unmodified libraries - libogg, libvorbis and libvorbisfile from Xiph.Org (Ogg Vorbis
+sound) - taken from the SoX 14.4.2 Windows package. They are under the Xiph.Org BSD-style licence; see
+[THIRD-PARTY-NOTICES.txt](THIRD-PARTY-NOTICES.txt). They are not part of this repository's source.
