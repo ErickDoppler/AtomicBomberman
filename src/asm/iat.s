@@ -1,0 +1,31 @@
+    .intel_syntax noprefix
+    .data
+iat_004a7178:  .long _bm_SetCursor   # USER32.dll!SetCursor
+iat_004a7188:  .long _bm_ShowCursor   # USER32.dll!ShowCursor
+iat_004a7264:  .long _bm_CloseHandle   # KERNEL32.dll!CloseHandle
+iat_004a7268:  .long _bm_CreateFileA   # KERNEL32.dll!CreateFileA
+iat_004a726c:  .long _bm_CreateMutexA   # KERNEL32.dll!CreateMutexA
+iat_004a72ac:  .long _bm_ReadFile   # KERNEL32.dll!ReadFile
+iat_004a73c0:  .long _bm_CloseHandle   # KERNEL32.DLL!CloseHandle
+iat_004a73c8:  .long _bm_CreateFileA   # KERNEL32.DLL!CreateFileA
+iat_004a73cc:  .long _bm_CreateMutexA   # KERNEL32.DLL!CreateMutexA
+iat_004a73f0:  .long _bm_FindClose   # KERNEL32.DLL!FindClose
+iat_004a73f4:  .long _bm_FindFirstFileA   # KERNEL32.DLL!FindFirstFileA
+iat_004a73f8:  .long _bm_FindNextFileA   # KERNEL32.DLL!FindNextFileA
+iat_004a741c:  .long _bm_GetFileAttributesA   # KERNEL32.DLL!GetFileAttributesA
+iat_004a7420:  .long _bm_GetFileType   # KERNEL32.DLL!GetFileType
+iat_004a7450:  .long _bm_ReadFile   # KERNEL32.DLL!ReadFile
+iat_004a7468:  .long _bm_SetFilePointer   # KERNEL32.DLL!SetFilePointer
+iat_004a74b4:  .long _bm_DirectDrawCreate   # DDRAW.dll!DirectDrawCreate
+iat_004a74f0:  .long _bm_setsockopt   # WSOCK32.dll!setsockopt
+iat_004a74f4:  .long _bm_WSAGetLastError   # WSOCK32.dll!WSAGetLastError
+iat_004a74f8:  .long _bm_recvfrom   # WSOCK32.dll!recvfrom
+iat_004a74fc:  .long _bm_ioctlsocket   # WSOCK32.dll!ioctlsocket
+iat_004a7500:  .long _bm_getsockname   # WSOCK32.dll!getsockname
+iat_004a7504:  .long _bm_closesocket   # WSOCK32.dll!closesocket
+iat_004a7508:  .long _bm_bind   # WSOCK32.dll!bind
+iat_004a750c:  .long _bm_socket   # WSOCK32.dll!socket
+iat_004a7510:  .long _bm_sendto   # WSOCK32.dll!sendto
+iat_004a7514:  .long _bm_htons   # WSOCK32.dll!htons
+iat_004a7518:  .long _bm_WSACleanup   # WSOCK32.dll!WSACleanup
+iat_004a751c:  .long _bm_WSAStartup   # WSOCK32.dll!WSAStartup

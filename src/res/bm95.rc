@@ -1,0 +1,29 @@
+#include <winuser.h>
+
+/* application icon, taken from the original distribution */
+1 ICON "bm95.ico"
+
+/* manifest: runs on Windows 7 .. 11, no compatibility shims, no DPI virtualization surprises */
+1 RT_MANIFEST "bm95.manifest"
+
+1 VERSIONINFO
+FILEVERSION 1,1,0,0
+PRODUCTVERSION 1,1,0,0
+FILEOS 0x4
+FILETYPE 0x1
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904B0"
+    BEGIN
+      VALUE "FileDescription", "Atomic Bomberman (restored, TCP network play)"
+      VALUE "ProductName", "Atomic Bomberman"
+      VALUE "FileVersion", "1.1.0.0"
+      VALUE "OriginalFilename", "AtomicBomberman.exe"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x0409, 1200
+  END
+END
