@@ -7,13 +7,15 @@
 > asset converters and the bug fixes in this repository. This is an unofficial fan preservation project, not
 > affiliated with or endorsed by the original authors or publishers.
 >
-> **This repository contains no original game files.** The original executable and the game's data (graphics,
-> sound, levels, texts) are **not** included and are not redistributed. You need your own legitimate copy of the
-> game to build and play. Anyone can read, pull and fork this repository; only the owner pushes and merges.
+> **What is where.** The *repository* contains source code and tools only - no game data and no original executable.
+> The *release downloads* contain a complete, ready-to-play game: the restored program together with the game's graphics,
+> sound, levels and texts converted to PNG / Ogg Vorbis (the old PCX / raw-sound files are not included). Those assets are
+> the work of Hudson Soft / Interplay and are distributed here unchanged in content, as a preservation project, without any
+> claim of ownership. Anyone can read, pull and fork this repository; only the owner pushes and merges.
 
 This project takes the original `BM95.EXE` (Hudson Soft / Interplay, 1997), restores its
 assembly source, replaces the IPX network layer with TCP, and converts the DOS-era assets
-to PNG / Ogg Vorbis.  It needs a legitimate copy of the game to convert the assets from.
+to PNG / Ogg Vorbis.  The converted game (data included) is in the releases; `tools/pack_assets.py` redoes the conversion from an original installation.
 
 | | original | now |
 |---|---|---|

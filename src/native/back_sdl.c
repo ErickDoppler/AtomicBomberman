@@ -32,6 +32,10 @@ void SDL_SetWindowTitle(SDL_Window *w, const char *title);
 void SDL_SetWindowSize(SDL_Window *w, int width, int height);
 int SDL_ShowCursor(int toggle);
 int SDL_PollEvent(SDL_Event *e);
+uint64_t SDL_GetTicks64(void);
+typedef struct { const char *name; uint32_t flags, ntex, tex[16]; int mw, mh; } SDL_RendererInfo;
+int SDL_GetRendererInfo(SDL_Renderer *r, SDL_RendererInfo *i);
+const char *SDL_GetCurrentVideoDriver(void);
 int SDL_GetDisplayBounds(int index, SDL_Rect *r);
 int SDL_OpenAudio(SDL_AudioSpec *want, SDL_AudioSpec *have);
 void SDL_PauseAudio(int pause);
@@ -105,6 +109,7 @@ void back_set_mode(int w, int h) {
         ren = SDL_CreateRenderer(win, -1, getenv("BM_VSYNC") ? SDL_RENDERER_PRESENTVSYNC : 0);
         if (!ren) ren = SDL_CreateRenderer(win, -1, 0);
         if (!ren) { fprintf(stderr, "SDL: %s\n", SDL_GetError()); exit(1); }
+        if (getenv("BM_FPS")) { SDL_RendererInfo ri; if (!SDL_GetRendererInfo(ren, &ri)) fprintf(stderr, "SDL video driver %s, renderer %s flags %x\n", SDL_GetCurrentVideoDriver(), ri.name, ri.flags); }
         SDL_RenderSetLogicalSize(ren, w, h);                          /* keeps the 4:3 shape, black bars around */
         SDL_ShowCursor(0);
         if (getenv("BM_FULLSCREEN")) back_fullscreen(1);
@@ -117,11 +122,16 @@ void back_present(const uint8_t *pix, const uint32_t *pal, int w, int h) {
     int n = w * h, i;
     frame_n++;
     if (!tex || !rgb) return;
+    static uint64_t t_conv, t_upd, t_pres; static unsigned cnt; uint64_t t0 = SDL_GetTicks64();
     for (i = 0; i < n; i++) rgb[i] = 0xFF000000u | pal[pix[i]];
+    t_conv += SDL_GetTicks64() - t0; t0 = SDL_GetTicks64();
     SDL_UpdateTexture(tex, 0, rgb, w * 4);
     SDL_RenderClear(ren);
     SDL_RenderCopy(ren, tex, 0, 0);
+    t_upd += SDL_GetTicks64() - t0; t0 = SDL_GetTicks64();
     SDL_RenderPresent(ren);
+    t_pres += SDL_GetTicks64() - t0;
+    if (getenv("BM_FPS") && ++cnt % 120 == 0) { fprintf(stderr, "per frame ms: convert %.1f upload+copy %.1f present %.1f\n", t_conv / 120.0, t_upd / 120.0, t_pres / 120.0); t_conv = t_upd = t_pres = 0; }
 }
 
 /* SDL scan code (USB usage) -> DirectInput scan code */
