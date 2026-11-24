@@ -8,15 +8,35 @@
 #ifndef BM_H
 #define BM_H
 
+#ifdef BM_NATIVE
+#include "w32.h"                 /* the portable build: the Win32 API is emulated (src/native) */
+#else
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#endif
 
 #define NAMELEN 32            /* player names on the wire / in the lobby (the game keeps up to 39) */
 
 /* Symbol exported to the restored assembly: shim for import "name" (stdcall). */
-#define BM_SHIM(ret, name, args) \
+#ifdef BM_NATIVE
+/* a function the game calls by address: registered with the host (argc = stdcall arguments it pops) */
+void host_shim(const char *name, int argc, void *fn);
+unsigned host_gsym(const char *name);
+#define BM_SHIM(ret, name, argc, args) \
+    static ret bm_##name args; \
+    static void __attribute__((constructor)) bm_reg_##name(void) { host_shim("bm_" #name, argc, (void *)bm_##name); } \
+    static ret bm_##name args
+/* __asm__("_bm_x") symbol names are only needed to reach the restored assembly */
+#define __asm__(...)
+/* variables the restored assembly reads: they live in guest memory */
+#define BM_GVAR(type, name) (*(type *)(uintptr_t)({ static unsigned a_; if (!a_) a_ = host_gsym(#name); a_; }))
+#define bm_skip_intro BM_GVAR(int, bm_skip_intro)
+#define bm_lobby_cancelled BM_GVAR(int, bm_lobby_cancelled)
+#else
+#define BM_SHIM(ret, name, argc, args) \
     ret __stdcall bm_##name args __asm__("_bm_" #name); \
     ret __stdcall bm_##name args
+#endif
 
 /* ---- tiny runtime (rt.c) ---- */
 int   bm_strlen(const char *s);

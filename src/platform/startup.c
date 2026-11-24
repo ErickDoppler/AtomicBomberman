@@ -3,7 +3,9 @@
 #include "bm.h"
 
 bm_config_t bm_cfg;
+#ifndef BM_NATIVE
 int bm_skip_intro __asm__("_bm_skip_intro");      /* read by the intro hook in src/asm/hooks.s */
+#endif
 
 typedef struct { HANDLE (__stdcall *CreateFileA)(LPCSTR, DWORD, DWORD, LPSECURITY_ATTRIBUTES, DWORD, DWORD, HANDLE);
                  BOOL (__stdcall *ReadFile)(HANDLE, LPVOID, DWORD, LPDWORD, LPOVERLAPPED);
@@ -127,6 +129,16 @@ void bm_save_ini(void) {
    it with a marker file in the user's local application data. */
 static int force_intro;
 static int intro_marker(char *path, int size) {
+#ifdef BM_NATIVE
+    {   const char *x = bm_getenv("XDG_DATA_HOME"), *h = bm_getenv("HOME"), *l = bm_getenv("LOCALAPPDATA");
+        if (l) { bm_strcpy(path, l); }
+        else if (x) { bm_strcpy(path, x); }
+        else if (h) { bm_strcpy(path, h); bm_strcat(path, "/.local/share"); }
+        else return 0;
+        bm_strcat(path, "\\AtomicBomberman");
+        return 1;
+    }
+#endif
     DWORD (__stdcall *getenv_)(LPCSTR, LPSTR, DWORD) = bm_api("kernel32.dll", "GetEnvironmentVariableA");
     DWORD n;
     if (!getenv_) return 0;
@@ -195,6 +207,7 @@ static int parse_cmdline(void) {
  * through the "DWM8And16BitMitigation" compatibility layer, which the OS normally attaches to an
  * executable after it has failed once (and remembers per path).  Request the layer up front by
  * restarting ourselves with __COMPAT_LAYER set, so the game works from any folder first time. */
+#ifndef BM_NATIVE
 static void relaunch_with_layer(void) {
     DWORD (__stdcall *getenv_)(LPCSTR, LPSTR, DWORD) = bm_api("kernel32.dll", "GetEnvironmentVariableA");
     BOOL (__stdcall *setenv_)(LPCSTR, LPCSTR) = bm_api("kernel32.dll", "SetEnvironmentVariableA");
@@ -228,16 +241,22 @@ static void relaunch_with_layer(void) {
     imp_ExitProcess(code);
 }
 
+#endif /* !BM_NATIVE */
+
 /* ---------------------------------------------------------------- entry point */
+#ifndef BM_NATIVE
 extern void bm_entry(void) __asm__("_bm_entry");        /* original program entry (restored code) */
 extern void bm_start(void) __asm__("_bm_start");
 extern void (__stdcall *imp_ExitProcess)(UINT) __asm__("__imp__ExitProcess");
+#endif
 
 void bm_start(void) {
     char *s;
     int decided;
     load_k32();
+#ifndef BM_NATIVE
     if (0) relaunch_with_layer();     /* no longer needed: ddraw.c emulates the 8-bit display mode */
+#endif
     k.GetModuleFileNameA(0, bm_cfg.exedir, sizeof bm_cfg.exedir);
     for (s = bm_cfg.exedir + bm_strlen(bm_cfg.exedir); s > bm_cfg.exedir && s[-1] != '\\'; s--) {}
     *s = 0;
@@ -255,6 +274,8 @@ void bm_start(void) {
     bm_cfg.preset = decided ? bm_cfg.mode : BM_NET_ASK;
     if (!decided) bm_cfg.mode = BM_NET_ASK;
     bm_log("start: net mode %d host port %d join %s:%d", bm_cfg.mode, bm_cfg.port, bm_cfg.address, bm_cfg.jport);
+#ifndef BM_NATIVE
     __asm__ volatile("jmp _bm_entry");
     for (;;) {}
+#endif
 }

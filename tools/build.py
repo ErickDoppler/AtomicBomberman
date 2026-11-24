@@ -86,12 +86,13 @@ def main():
         res = BUILD + r"\bm95_res.o"
         run([BIN + r"\windres.exe", "-F", "pe-i386", "-I", ROOT + r"\src\res", "-i", ROOT + r"\src\res\bm95.rc", "-o", res])
         objs.append(res)
-    out = BUILD + (r"\bm95_check.exe" if check else r"\AtomicBomberman.exe")
+    reloc = bool(os.environ.get("BM_RELOC"))      # keep the relocation table (input of tools/x2c)
+    out = BUILD + (r"\bm95_check.exe" if check else r"\bm95_reloc.exe" if reloc else r"\AtomicBomberman.exe")
     ldscript = open(ROOT + r"\src\link.ld").read().replace("@ENTRY@", entry)
     open(BUILD + r"\link.ld", "w").write(ldscript)
     run([BIN + r"\ld.exe", "-m", "i386pe", "--subsystem", "windows:4.0", "-T", BUILD + r"\link.ld",
-         "--image-base", "0x400000", "--stack", "0x100000,0x10000", "--disable-reloc-section", "--no-seh",
-         "--disable-runtime-pseudo-reloc", "-o", out] + objs + libs)
+         "--image-base", "0x400000", "--stack", "0x100000,0x10000", "--no-seh",
+         "--disable-runtime-pseudo-reloc", "-Map", BUILD + r"\link.map", "-o", out] + ([] if reloc else ["--disable-reloc-section"]) + objs + libs)
     print("linked", out, os.path.getsize(out))
     if check:
         compare(im, out)

@@ -5,7 +5,7 @@ Seeds: entry point, every relocated pointer that lands in the code section
 decoding.  Gaps are then probed: a gap that linearly decodes to its end and
 finishes with ret/jmp is treated as an (unreferenced) function.
 """
-import sys, pickle, collections
+import sys, os, pickle, collections
 sys.path.insert(0, r"E:\PROJECTS\DESKTOP\AtomicBomberman\tools")
 from pe_load import Image
 import capstone as cs
@@ -13,6 +13,9 @@ from capstone import x86_const as X
 
 EXE = r"E:\PROJECTS\DESKTOP\AtomicBomberman\reference\BM95.EXE"
 OUT = r"E:\PROJECTS\DESKTOP\AtomicBomberman\tools\disasm.pkl"
+if len(sys.argv) >= 3:                  # disasm.py <exe> <out.pkl>: disassemble another build (the patched game for tools/x2c)
+    EXE, OUT = sys.argv[1], sys.argv[2]
+EXTRA_SEEDS = [int(x, 16) for x in sys.argv[3:]]      # more code seeds (the original entry point of the patched game)
 
 PAD = (b"\x90", b"\xcc", b"\x00", b"\x8b\xc0", b"\x8d\x40\x00", b"\x8d\x49\x00",
        b"\x89\xc0", b"\x8b\xff", b"\x8d\x76\x00", b"\x8d\xb6\x00\x00\x00\x00")
@@ -35,6 +38,8 @@ class Dis:
         self.im = Image(EXE)
         code = self.im.sections[0]
         self.lo, self.hi = code["va"], code["va"] + code["size"]
+        if os.environ.get("DIS_LO"):                       # disassemble another code range (the hook section of the patched game)
+            self.lo, self.hi = int(os.environ["DIS_LO"], 16), int(os.environ["DIS_HI"], 16)
         self.md = cs.Cs(cs.CS_ARCH_X86, cs.CS_MODE_32)
         self.md.detail = True
         self.md.syntax = cs.CS_OPT_SYNTAX_INTEL
@@ -44,6 +49,8 @@ class Dis:
         self.bad = []
         self.own = bytearray(self.hi - self.lo)   # 1 = byte belongs to an instruction, 2 = reserved data
         self.conflicts = []
+        self.overlaps = []
+        self.allow_overlap = True
         self.tables = []
 
     def seed(self, a):
@@ -61,10 +68,13 @@ class Dis:
                     self.bad.append(a)
                     break
                 i = got[0]
-                if any(self.own[a - self.lo: a - self.lo + i.size]):
+                overlap = any(self.own[a - self.lo: a - self.lo + i.size])
+                if overlap and not self.allow_overlap:
                     self.conflicts.append(a)
                     break
-                self.own[a - self.lo: a - self.lo + i.size] = b"" * i.size
+                if overlap:                                  # a branch lands in the middle of another instruction (Watcom's
+                    self.overlaps.append(a)                  # "test ax, imm" trick): both decodings are code
+                if not overlap: self.own[a - self.lo: a - self.lo + i.size] = b"" * i.size
                 enc = i.encoding
                 d = dict(va=a, size=i.size, bytes=bytes(i.bytes), mn=i.mnemonic, ops=i.op_str,
                          disp_off=enc.disp_offset if enc.disp_size else None, disp_size=enc.disp_size,
@@ -91,7 +101,7 @@ class Dis:
     def prune(self):
         """Drop 'code' that runs off the end of a function into data (junk opcodes, zero fill)."""
         BANNED = ("in", "out", "insb", "insd", "outsb", "outsd", "lcall", "ljmp", "aam", "aad", "aaa", "aas", "daa", "das",
-                  "salc", "arpl", "iretd", "iret", "sysenter", "syscall", "int", "into", "bound", "retf", "lret", "enter", "cli", "sti")
+                  "salc", "arpl", "iretd", "iret", "sysenter", "syscall", "int", "into", "bound", "retf", "lret", "cli", "sti")
         entries = set(self.seeds)
         for d in self.insns.values():
             if d["target"] is not None:
@@ -111,7 +121,7 @@ class Dis:
             while k < len(ch):
                 d = self.insns[ch[k]]
                 zero = d["bytes"] == b"\x00\x00" and k + 1 < len(ch) and self.insns[ch[k + 1]]["bytes"] == b"\x00\x00"
-                if d["mn"] in BANNED or zero:
+                if d["mn"] in BANNED or zero or (d["mn"] == "enter" and not d["ops"].endswith(", 0")):
                     j = k
                     while j < len(ch) and (j == k or ch[j] not in entries):
                         del self.insns[ch[j]]
@@ -130,15 +140,17 @@ class Dis:
         snap_o = bytearray(self.own)
         snap_s = set(self.seeds)
         nb, nc = len(self.bad), len(self.conflicts)
+        self.allow_overlap = False
         self.seed(start)
         self.run()
+        self.allow_overlap = True
         BANNED = ("in", "out", "insb", "insd", "outsb", "outsd", "lcall", "ljmp", "aam", "aad", "aaa", "aas", "daa", "das",
-                  "salc", "arpl", "iretd", "iret", "sysenter", "syscall", "int", "into", "bound", "retf", "lret", "enter", "cli", "sti")
+                  "salc", "arpl", "iretd", "iret", "sysenter", "syscall", "int", "into", "bound", "retf", "lret", "cli", "sti")
         junk = False
         for a2, d2 in self.insns.items():
             if a2 in snap_i:
                 continue
-            if d2["mn"] in BANNED or (d2["mn"] == "pop" and d2["ops"] in ("ss", "ds", "es")):
+            if d2["mn"] in BANNED or (d2["mn"] == "enter" and not d2["ops"].endswith(", 0")) or (d2["mn"] == "pop" and d2["ops"] in ("ss", "ds", "es")):
                 junk = True
                 break
             for r in range(a2, a2 + d2["size"]):
@@ -191,6 +203,8 @@ def main():
     for m in _re0.finditer(rb"[\x20-\x7e]{14,}\x00*", im.read(D.lo, D.hi - D.lo)):
         D.own[m.start(): m.end()] = b"\x02" * (m.end() - m.start())
     D.seed(im.entry)
+    for x in EXTRA_SEEDS:
+        D.seed(x)
     # phase 1: pointers stored in data sections
     for r in sorted(im.relocs):
         if D.lo <= r < D.hi:

@@ -149,7 +149,7 @@ static unsigned char *load_converted(const char *alt, int kind, DWORD *outsize) 
 }
 
 /* ------------------------------------------------------------------ hooked API */
-BM_SHIM(HANDLE, CreateFileA, (LPCSTR name, DWORD acc, DWORD share, LPSECURITY_ATTRIBUTES sa, DWORD disp, DWORD flags, HANDLE tmpl)) {
+BM_SHIM(HANDLE, CreateFileA, 7, (LPCSTR name, DWORD acc, DWORD share, LPSECURITY_ATTRIBUTES sa, DWORD disp, DWORD flags, HANDLE tmpl)) {
     HANDLE h;
     char alt[MAX_PATH], rd[MAX_PATH]; int kind; DWORD err;
     kinit();
@@ -168,7 +168,7 @@ BM_SHIM(HANDLE, CreateFileA, (LPCSTR name, DWORD acc, DWORD share, LPSECURITY_AT
     return h;
 }
 
-BM_SHIM(BOOL, ReadFile, (HANDLE h, LPVOID buf, DWORD n, LPDWORD got, LPOVERLAPPED ov)) {
+BM_SHIM(BOOL, ReadFile, 5, (HANDLE h, LPVOID buf, DWORD n, LPDWORD got, LPOVERLAPPED ov)) {
     kinit();
     if (is_vhandle(h)) {
         vfile_t *f = vh(h); DWORD left;
@@ -185,7 +185,7 @@ BM_SHIM(BOOL, ReadFile, (HANDLE h, LPVOID buf, DWORD n, LPDWORD got, LPOVERLAPPE
     { BOOL r = k.ReadFile(h, buf, n, got, ov); bm_log("vfs: real read h=%x n=%d -> %d got %d", (unsigned)(UINT_PTR)h, (int)n, (int)r, got ? (int)*got : -1); return r; }
 }
 
-BM_SHIM(DWORD, SetFilePointer, (HANDLE h, LONG lo, PLONG hi, DWORD method)) {
+BM_SHIM(DWORD, SetFilePointer, 4, (HANDLE h, LONG lo, PLONG hi, DWORD method)) {
     kinit();
     if (is_vhandle(h)) {
         vfile_t *f = vh(h); LONG64 np;
@@ -200,7 +200,7 @@ BM_SHIM(DWORD, SetFilePointer, (HANDLE h, LONG lo, PLONG hi, DWORD method)) {
     { DWORD r = k.SetFilePointer(h, lo, hi, method); bm_log("vfs: real seek h=%x m=%d lo=%d -> %d", (unsigned)(UINT_PTR)h, (int)method, (int)lo, (int)r); return r; }
 }
 
-BM_SHIM(BOOL, CloseHandle, (HANDLE h)) {
+BM_SHIM(BOOL, CloseHandle, 1, (HANDLE h)) {
     kinit();
     if (is_vhandle(h)) {
         vfile_t *f = vh(h);
@@ -211,12 +211,12 @@ BM_SHIM(BOOL, CloseHandle, (HANDLE h)) {
     return k.CloseHandle(h);
 }
 
-BM_SHIM(DWORD, GetFileType, (HANDLE h)) {
+BM_SHIM(DWORD, GetFileType, 1, (HANDLE h)) {
     kinit();
     { DWORD r = is_vhandle(h) ? FILE_TYPE_DISK : k.GetFileType(h); bm_log("vfs: filetype %x -> %d", (unsigned)(UINT_PTR)h, (int)r); return r; }
 }
 
-BM_SHIM(DWORD, GetFileAttributesA, (LPCSTR name)) {
+BM_SHIM(DWORD, GetFileAttributesA, 1, (LPCSTR name)) {
     DWORD a; char alt[MAX_PATH], rd[MAX_PATH];
     kinit();
     name = redir(name, rd);
@@ -243,7 +243,7 @@ static void rename_back(vfind_t *v, WIN32_FIND_DATAA *fd) {
     } else if (n > 4 && !bm_stricmp(fd->cFileName + n - 4, ".png")) bm_strcpy(fd->cFileName + n - 4, ".PCX");
 }
 
-BM_SHIM(HANDLE, FindFirstFileA, (LPCSTR pat, LPWIN32_FIND_DATAA fd)) {
+BM_SHIM(HANDLE, FindFirstFileA, 2, (LPCSTR pat, LPWIN32_FIND_DATAA fd)) {
     int i, n;
     HANDLE h;
     char rd[MAX_PATH];
@@ -273,7 +273,7 @@ BM_SHIM(HANDLE, FindFirstFileA, (LPCSTR pat, LPWIN32_FIND_DATAA fd)) {
     return h;
 }
 
-BM_SHIM(BOOL, FindNextFileA, (HANDLE h, LPWIN32_FIND_DATAA fd)) {
+BM_SHIM(BOOL, FindNextFileA, 2, (HANDLE h, LPWIN32_FIND_DATAA fd)) {
     kinit();
     if ((unsigned)(UINT_PTR)h >= VFBASE && (unsigned)(UINT_PTR)h < VFBASE + NVFIND * 4) {
         vfind_t *v = &vfinds[((unsigned)(UINT_PTR)h - VFBASE) >> 2];
@@ -292,7 +292,7 @@ BM_SHIM(BOOL, FindNextFileA, (HANDLE h, LPWIN32_FIND_DATAA fd)) {
     return k.FindNextFileA(h, fd);
 }
 
-BM_SHIM(BOOL, FindClose, (HANDLE h)) {
+BM_SHIM(BOOL, FindClose, 1, (HANDLE h)) {
     kinit();
     if ((unsigned)(UINT_PTR)h >= VFBASE && (unsigned)(UINT_PTR)h < VFBASE + NVFIND * 4) {
         vfind_t *v = &vfinds[((unsigned)(UINT_PTR)h - VFBASE) >> 2];

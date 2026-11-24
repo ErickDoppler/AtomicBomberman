@@ -8,23 +8,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-extern uint8_t *x2c_mem;                       /* program memory: address 0 = x2c_mem[0] */
+/* The guest address space is mapped at the same addresses in the host process (see x2c_main.c): a guest address IS a host pointer. */
+#define GP(a) ((uint8_t *)(uintptr_t)(uint32_t)(a))
 extern uint32_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
 extern uint8_t cf, zf, sf, of, pf, df;
 extern uint64_t mm[8];
+extern uint32_t x2c_fs;                       /* base of the fs segment: the thread information block (exception chain, stack limits) */
 
-static inline uint8_t rd8(uint32_t a)  { return x2c_mem[a]; }
-static inline uint16_t rd16(uint32_t a) { uint16_t v; memcpy(&v, x2c_mem + a, 2); return v; }
-static inline uint32_t rd32(uint32_t a) { uint32_t v; memcpy(&v, x2c_mem + a, 4); return v; }
-static inline uint64_t rd64(uint32_t a) { uint64_t v; memcpy(&v, x2c_mem + a, 8); return v; }
-static inline void wr8(uint32_t a, uint32_t v)  { x2c_mem[a] = (uint8_t)v; }
-static inline void wr16(uint32_t a, uint32_t v) { uint16_t t = (uint16_t)v; memcpy(x2c_mem + a, &t, 2); }
-static inline void wr32(uint32_t a, uint32_t v) { memcpy(x2c_mem + a, &v, 4); }
-static inline void wr64(uint32_t a, uint64_t v) { memcpy(x2c_mem + a, &v, 8); }
-static inline float rdf32(uint32_t a) { float v; memcpy(&v, x2c_mem + a, 4); return v; }
-static inline double rdf64(uint32_t a) { double v; memcpy(&v, x2c_mem + a, 8); return v; }
-static inline void wrf32(uint32_t a, float v) { memcpy(x2c_mem + a, &v, 4); }
-static inline void wrf64(uint32_t a, double v) { memcpy(x2c_mem + a, &v, 8); }
+static inline uint8_t rd8(uint32_t a)  { return *GP(a); }
+static inline uint16_t rd16(uint32_t a) { uint16_t v; memcpy(&v, GP(a), 2); return v; }
+static inline uint32_t rd32(uint32_t a) { uint32_t v; memcpy(&v, GP(a), 4); return v; }
+static inline uint64_t rd64(uint32_t a) { uint64_t v; memcpy(&v, GP(a), 8); return v; }
+static inline void wr8(uint32_t a, uint32_t v)  { *GP(a) = (uint8_t)v; }
+static inline void wr16(uint32_t a, uint32_t v) { uint16_t t = (uint16_t)v; memcpy(GP(a), &t, 2); }
+static inline void wr32(uint32_t a, uint32_t v) { memcpy(GP(a), &v, 4); }
+static inline void wr64(uint32_t a, uint64_t v) { memcpy(GP(a), &v, 8); }
+static inline float rdf32(uint32_t a) { float v; memcpy(&v, GP(a), 4); return v; }
+static inline double rdf64(uint32_t a) { double v; memcpy(&v, GP(a), 8); return v; }
+static inline void wrf32(uint32_t a, float v) { memcpy(GP(a), &v, 4); }
+static inline void wrf64(uint32_t a, double v) { memcpy(GP(a), &v, 8); }
 double rdf80(uint32_t a);
 void wrf80(uint32_t a, double v);
 
@@ -64,4 +66,10 @@ void x2c_div0(void);
 #define X2C_FELL(a) x2c_unimpl((a), "fell off the end of the known code")
 #define X2C_STOP(a) x2c_unimpl((a), "int3 / int1")
 #define X2C_DIVCHK(d) do { if (!(d)) x2c_div0(); } while (0)
+#ifdef X2C_CALLS
+void x2c_enter(uint32_t va);                  /* debugging: log every function entered (build with -DX2C_CALLS) */
+#define X2C_ENTER(a) x2c_enter(a)
+#else
+#define X2C_ENTER(a)
+#endif
 #endif

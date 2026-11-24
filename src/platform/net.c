@@ -56,7 +56,9 @@ static struct {
     int (__stdcall *gethostname)(char *, int);
 } ws;
 static int ws_ready;
-typedef struct { short family; unsigned short port; unsigned long addr; char zero[8]; } sockaddr_in_t;
+#pragma pack(push, 1)
+typedef struct { short family; unsigned short port; unsigned addr; char zero[8]; } sockaddr_in_t;
+#pragma pack(pop)
 
 static int ws_load(void) {
     if (ws_ready) return 1;
@@ -409,12 +411,12 @@ static struct { char addr[128]; int port; } conn_req;
 static DWORD __stdcall connect_thread(void *arg) {
     int g = (int)(INT_PTR)arg, waited, one = 1;
     sockaddr_in_t sa;
-    unsigned long a;
+    unsigned a;
     SOCK s;
     memset(&sa, 0, sizeof sa);
     sa.family = 2; sa.port = ws.htons((unsigned short)conn_req.port);
     a = ws.inet_addr(conn_req.addr);
-    if (a == 0xffffffffUL) {
+    if (a == 0xffffffffu) {
         void *he = ws.gethostbyname(conn_req.addr);
         if (!he) { if (gen == g) conn_state = 3; return 0; }
         memcpy(&a, (*(char ***)((char *)he + 12))[0], 4);
@@ -535,7 +537,9 @@ void bm_role_hook(int role, const char *nodename) {
 /* The lobby runs before the game starts connecting (src/asm/hooks.s bm_net_session calls this): when the player
    leaves it with Back, the game never begins to "connect the network object" and returns to the menu at once.
    Returns 0 to go on, 1 when the player cancelled. */
+#ifndef BM_NATIVE
 int bm_lobby_cancelled __asm__("_bm_lobby_cancelled");
+#endif
 static int lobby_done;
 int bm_session_lobby(void) __asm__("_bm_session_lobby");
 int bm_session_lobby(void) {
@@ -549,7 +553,7 @@ int bm_session_lobby(void) {
     return 0;
 }
 
-BM_SHIM(int, WSAStartup, (WORD ver, void *data)) {
+BM_SHIM(int, WSAStartup, 2, (WORD ver, void *data)) {
     int host = (bm_cfg.role == ROLE_SERVER || bm_cfg.role == 0);
     bm_log("net: WSAStartup called by the game (running=%d)", running);
     (void)ver;
@@ -567,26 +571,26 @@ BM_SHIM(int, WSAStartup, (WORD ver, void *data)) {
     lobby_done = 0;
     return 0;
 }
-BM_SHIM(int, WSACleanup, (void)) { bm_log("net: WSACleanup called by the game"); bm_net_stop(); return 0; }
-BM_SHIM(int, WSAGetLastError, (void)) { return werr; }
-BM_SHIM(unsigned short, htons, (unsigned short v)) { return (unsigned short)((v << 8) | (v >> 8)); }
+BM_SHIM(int, WSACleanup, 0, (void)) { bm_log("net: WSACleanup called by the game"); bm_net_stop(); return 0; }
+BM_SHIM(int, WSAGetLastError, 0, (void)) { return werr; }
+BM_SHIM(unsigned short, htons, 1, (unsigned short v)) { return (unsigned short)((v << 8) | (v >> 8)); }
 
-BM_SHIM(SOCK, socket, (int af, int type, int proto)) {
+BM_SHIM(SOCK, socket, 3, (int af, int type, int proto)) {
     int i;
     (void)af; (void)type; (void)proto;
     for (i = 0; i < MAXVS; i++)
         if (!vs[i].open) { vs[i].open = 1; vs[i].bound = 0; return VS_BASE + (SOCK)i; }
     werr = 10024; return (SOCK)-1;
 }
-BM_SHIM(int, closesocket, (SOCK s)) { vsock_t *v = vget(s); if (v) v->open = 0; return 0; }
-BM_SHIM(int, bind, (SOCK s, const ipxaddr_t *a, int len)) {
+BM_SHIM(int, closesocket, 1, (SOCK s)) { vsock_t *v = vget(s); if (v) v->open = 0; return 0; }
+BM_SHIM(int, bind, 3, (SOCK s, const ipxaddr_t *a, int len)) {
     vsock_t *v = vget(s); (void)len;
     if (!v) { werr = 10038; return -1; }
     v->bound = a->sock;
     bm_log("net: bind socket %x", (unsigned)a->sock);
     return 0;
 }
-BM_SHIM(int, getsockname, (SOCK s, ipxaddr_t *a, int *len)) {
+BM_SHIM(int, getsockname, 3, (SOCK s, ipxaddr_t *a, int *len)) {
     vsock_t *v = vget(s);
     if (!v) { werr = 10038; return -1; }
     memset(a, 0, sizeof *a);
@@ -600,7 +604,7 @@ BM_SHIM(int, getsockname, (SOCK s, ipxaddr_t *a, int *len)) {
 /* The game's receive routine first asks FIONREAD how many bytes the next datagram has and only calls
  * recvfrom when that is not zero; FIONBIO (switch to non-blocking, always the case here) needs nothing. */
 #define FIONREAD_ 0x4004667fUL
-BM_SHIM(int, ioctlsocket, (SOCK s, long cmd, unsigned long *arg)) {
+BM_SHIM(int, ioctlsocket, 3, (SOCK s, long cmd, unsigned long *arg)) {
     if ((unsigned long)cmd == FIONREAD_) {
         vsock_t *v = vget(s);
         int i, n = 0;
@@ -614,9 +618,9 @@ BM_SHIM(int, ioctlsocket, (SOCK s, long cmd, unsigned long *arg)) {
     }
     return 0;
 }
-BM_SHIM(int, setsockopt, (SOCK s, int lvl, int opt, const char *val, int len)) { (void)s; (void)lvl; (void)opt; (void)val; (void)len; return 0; }
+BM_SHIM(int, setsockopt, 5, (SOCK s, int lvl, int opt, const char *val, int len)) { (void)s; (void)lvl; (void)opt; (void)val; (void)len; return 0; }
 
-BM_SHIM(int, sendto, (SOCK s, const char *buf, int len, int flags, const ipxaddr_t *to, int tolen)) {
+BM_SHIM(int, sendto, 6, (SOCK s, const char *buf, int len, int flags, const ipxaddr_t *to, int tolen)) {
     vsock_t *v = vget(s);
     unsigned char body[MAXDG + sizeof(dgram_hdr_t)];
     dgram_hdr_t *h = (dgram_hdr_t *)body;
@@ -633,7 +637,7 @@ BM_SHIM(int, sendto, (SOCK s, const char *buf, int len, int flags, const ipxaddr
     return len;
 }
 
-BM_SHIM(int, recvfrom, (SOCK s, char *buf, int len, int flags, ipxaddr_t *from, int *fromlen)) {
+BM_SHIM(int, recvfrom, 6, (SOCK s, char *buf, int len, int flags, ipxaddr_t *from, int *fromlen)) {
     vsock_t *v = vget(s);
     int i, found = -1, n;
     (void)flags;

@@ -318,7 +318,7 @@ static void build_tables(void) {
     pal_vt[4] = (void *)p_GetEntries; pal_vt[6] = (void *)p_SetEntries;
 }
 
-BM_SHIM(HRESULT, DirectDrawCreate, (const void *guid, obj_t **out, void *outer)) {
+BM_SHIM(HRESULT, DirectDrawCreate, 3, (const void *guid, obj_t **out, void *outer)) {
     (void)guid; (void)outer;
     build_tables();
     uinit();

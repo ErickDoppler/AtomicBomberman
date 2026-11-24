@@ -9,7 +9,7 @@ static HCURSOR arrow(void) {
     return c;
 }
 
-BM_SHIM(int, ShowCursor, (BOOL show)) {
+BM_SHIM(int, ShowCursor, 1, (BOOL show)) {
     static int once;
     int (__stdcall *real)(BOOL) = bm_api("user32.dll", "ShowCursor");
     (void)show;
@@ -17,7 +17,7 @@ BM_SHIM(int, ShowCursor, (BOOL show)) {
     return 1;
 }
 
-BM_SHIM(HCURSOR, SetCursor, (HCURSOR c)) {
+BM_SHIM(HCURSOR, SetCursor, 1, (HCURSOR c)) {
     HCURSOR (__stdcall *real)(HCURSOR) = bm_api("user32.dll", "SetCursor");
     return real(c ? c : arrow());
 }

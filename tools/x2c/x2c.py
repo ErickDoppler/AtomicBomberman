@@ -11,7 +11,12 @@ The translated program keeps the original machine state in C variables and the g
 stack, the heap) in one flat array, so it behaves like the original on any CPU.  Operating-system calls (imports) are
 not translated: indirect calls to the import table go to host functions (see x2c_rt.h, x2c_host.h).
 
-usage: python x2c.py <original BM95.EXE> <out dir>
+usage: python x2c.py <exe> <out dir> [--pkl a.pkl --pkl b.pkl ...] [--map link.map]
+
+  --pkl   instruction maps (tools/disasm.py) of the code to translate; default tools/disasm.pkl (the original program).
+          For the patched game: build/bm95_reloc.pkl (game code) and build/bm95_hooks.pkl (the asm glue)
+  --map   linker map of the build: names the platform-layer (native C) functions the translated code calls; they are
+          written to <out>/hostsyms.c and implemented by the host (rt/x2c_host.c)
 """
 import os, re, sys, pickle, collections
 
@@ -83,6 +88,10 @@ def parse_op(t, default_size=0):
         size = SIZES[m.group(1)]; t = m.group(2).strip()
     elif t.startswith("ptr "):
         t = t[4:].strip()
+    fs = False
+    m = re.match(r"^(es|cs|ss|ds|fs|gs):(.*)$", t)             # a segment override: only fs (the thread information block) is not flat
+    if m:
+        fs = m.group(1) == "fs"; t = m.group(2).strip()
     if "[" in t:
         inner = t[t.index("[") + 1:t.rindex("]")]
         inner = inner.replace("-", "+-").replace(" ", "")
@@ -103,6 +112,7 @@ def parse_op(t, default_size=0):
         for p in parts:
             expr += " " + p[0] + " " + p[1:]
         expr = re.sub(r"\b(e[a-d]x|e[sd]i|e[sb]p)\b", lambda mm: mm.group(1), expr)
+        if fs: expr = "x2c_fs + (%s)" % expr
         return Op("mem", size, t, addr="(uint32_t)(%s)" % expr)
     if t in R32: return Op("reg", 4, t, reg=("r32", R32.index(t)))
     if t in R16: return Op("reg", 2, t, reg=("r16", R16.index(t)))
@@ -159,12 +169,19 @@ class Fn:
 
 
 class Translator:
-    def __init__(self, exe, outdir):
+    def __init__(self, exe, outdir, pkls=None, mapfile=None):
         self.im = Image(exe)
         self.out = outdir
-        D = pickle.load(open(os.path.join(HERE, "..", "disasm.pkl"), "rb"))
-        self.d = D["insns"]
+        self.d = {}
+        for pk in pkls or [os.path.join(HERE, "..", "disasm.pkl")]:
+            self.d.update(pickle.load(open(pk, "rb"))["insns"])
         self.lo, self.hi = 0x401000, 0x458000
+        self.syms = {}
+        if mapfile:
+            for line in open(mapfile, errors="replace"):
+                g = re.match(r"\s+0x([0-9a-f]{8})\s+(\S+)\s*$", line)
+                if g:
+                    self.syms.setdefault(int(g.group(1), 16), g.group(2))
         self.unimpl = collections.Counter()
         self.stats = collections.Counter()
 
@@ -172,18 +189,20 @@ class Translator:
     def find_functions(self):
         d, im = self.d, self.im
         entries = {im.entry}
+        for a2, n2 in self.syms.items():
+            if n2 in ("_bm_entry", "bm_entry"): entries.add(a2)          # the original entry point of the patched game
         for a, i in d.items():
             if i["flow"] == "call" and i["target"] is not None:
                 entries.add(i["target"])
         for r in im.relocs:                                       # code pointers kept in data (callbacks, handler tables)
             v = im.u32(r)
-            if v is not None and self.lo <= v < self.hi and v in d:
+            if v is not None and v in d:
                 entries.add(v)
         # a pointer-sized immediate that is a code address (mov eax, offset f) in live code counts too
         for a, i in d.items():
             if i["imm_off"] is not None and i["imm_size"] == 4 and (a + i["imm_off"]) in im.relocs:
                 v = im.u32(a + i["imm_off"])
-                if v is not None and self.lo <= v < self.hi and v in d:
+                if v is not None and v in d:
                     entries.add(v)
         entries = {e for e in entries if e in d}
         self.entries = entries
@@ -275,17 +294,57 @@ class Translator:
             for va, (dll, fn) in items:
                 f.write('    { 0x%08x, "%s", "%s" },\n' % (va, dll, fn))
             f.write("};\nconst unsigned x2c_nimports = %d;\n" % len(items))
+        with open(os.path.join(self.out, "hostsyms.c"), "w", newline="\n") as f:          # platform-layer functions called by address
+            f.write('#include "x2c_host.h"\n')
+            f.write("const x2c_sym_t x2c_syms[] = {\n")
+            ext = sorted((a, n) for a, n in self.syms.items() if a >= 0x4a8000 and n.startswith(("bm_", "_bm_")))
+            for a, n in ext:
+                f.write('    { 0x%08x, "%s" },\n' % (a, n.lstrip("_")))
+            f.write("    { 0, 0 } };\nconst unsigned x2c_nsyms = %d;\n" % len(ext))
         import shutil
-        for f in ("x2c_rt.h", "x2c_rt.c", "x2c_host.h", "x2c_host.c", "x2c_main.c"):
+        self.write_image()
+        for f in ("x2c_rt.h", "x2c_rt.c", "x2c_host.h"):
             shutil.copyfile(os.path.join(HERE, "rt", f), os.path.join(self.out, f))
-        print("functions:", len(self.fns), "unimplemented instructions:", sum(self.unimpl.values()))
+        print("functions:", len(self.fns), "unimplemented instructions:", sum(self.unimpl.values()), "ends of known code:", self.stats["fell"])
         for k, v in self.unimpl.most_common(40):
             print("   %5d  %s" % (v, k))
 
+    def write_image(self):
+        """image.c: the initial contents of the program's own sections (code constants, jump tables, data, resources)"""
+        with open(os.path.join(self.out, "image.c"), "w", newline="\n") as f:
+            f.write('#include "x2c_host.h"\n#include <stdint.h>\n')
+            f.write("typedef struct { uint32_t va, size; const uint8_t *data; } x2c_section_t;\n")
+            names = []
+            for k, s in enumerate(self.im.sections):
+                if s["name"] in (".xtext", ".xbss") or not s["raw"] or s["name"] == ".idata":
+                    continue
+                raw = bytes(s["raw"][:s["rawsize"]])
+                f.write("static const uint8_t sec%d[%d] = {" % (k, len(raw)))
+                f.write(",".join(str(b) for b in raw))
+                f.write("};\n")
+                names.append((s["va"], len(raw), "sec%d" % k))
+            f.write("const x2c_section_t x2c_sections[] = {\n")
+            for va, n, nm in names:
+                f.write("    { 0x%08x, %d, %s },\n" % (va, n, nm))
+            f.write("};\nconst unsigned x2c_nsections = %d;\n" % len(names))
+            entry = None
+            for a2, n2 in self.syms.items():
+                if n2 in ("_bm_entry", "bm_entry"):
+                    entry = a2
+            f.write("const uint32_t x2c_entry_va = 0x%08x;\n" % (entry or self.im.entry))
+
     def emit_fn(self, fn):
         lines = ["void %s(void) {" % self.names[fn.entry]]
+        lines.append("    X2C_ENTER(0x%08x);" % fn.entry)
+        if fn.insns and fn.insns[0] != fn.entry:                  # code of the function lies below its entry point (shared epilogues)
+            lines.append("    goto L_%08x;" % fn.entry)
         d = self.d
         addrs = fn.insns
+        fn.insns_set = set(addrs)
+        for idx, a in enumerate(addrs):                               # instructions whose successor is not the next one in address order
+            nxt = a + d[a]["size"]
+            if d[a]["flow"] not in ("ret", "jmp", "jmpi", "stop") and (idx + 1 >= len(addrs) or addrs[idx + 1] != nxt) and nxt in fn.insns_set:
+                fn.labels.add(nxt)
         for idx, a in enumerate(addrs):
             i = d[a]
             if a in fn.labels or a == fn.entry:
@@ -298,7 +357,11 @@ class Translator:
             lines.append("    " + body)
             nxt = a + i["size"]
             if i["flow"] not in ("ret", "jmp", "jmpi", "stop") and (idx + 1 >= len(addrs) or addrs[idx + 1] != nxt):
-                lines.append("    X2C_FELL(0x%08x);" % nxt)         # walked off the end of the known code
+                if nxt in fn.insns_set:                               # overlapping instructions: the next one is not the next in address order
+                    lines.append("    goto L_%08x;" % nxt)
+                else:
+                    self.stats["fell"] += 1
+                    lines.append("    X2C_FELL(0x%08x);" % nxt)     # walked off the end of the known code
         lines.append("}")
         return "\n".join(lines)
 
@@ -359,6 +422,12 @@ class Translator:
             return self.stringop(mn, ol)
         if mn in ("movsb", "movsw", "movsd", "stosb", "stosw", "stosd", "lodsb", "lodsw", "lodsd", "scasb", "scasw", "scasd", "cmpsb", "cmpsw", "cmpsd") and \
                 not (mn == "movsd" and ol and ol[0].startswith(("xmm", "mm"))):
+            # the disassembler leaves a repeat prefix out of the text for some forms (f2 a5 = "repne movsd", which on a real
+            # processor repeats like "rep"): take it from the instruction bytes
+            raw = self.d[a]["bytes"]
+            k = 1 if raw[:1] == b"\x66" else 0
+            if raw[k:k + 1] == b"\xf3": mn = ("repe " if mn[:4] in ("scas", "cmps") else "rep ") + mn
+            elif raw[k:k + 1] == b"\xf2": mn = "repne " + mn
             return self.stringop(mn, ol)
         if mn == "wait":
             return ";"
@@ -401,8 +470,11 @@ class Translator:
             if o[0].kind == "reg" and o[0].reg == ("r32", 4): return "esp = POP32();"
             return "{ uint32_t v_ = POP32(); %s }" % wr(o[0], "v_", 4)
         if mn == "pushfd": return "PUSH32(x2c_getflags());"
+        if mn in ("pushal", "pusha"): return "{ uint32_t sp_ = esp; PUSH32(eax); PUSH32(ecx); PUSH32(edx); PUSH32(ebx); PUSH32(sp_); PUSH32(ebp); PUSH32(esi); PUSH32(edi); }"
+        if mn in ("popal", "popa"): return "{ edi = POP32(); esi = POP32(); ebp = POP32(); (void)POP32(); ebx = POP32(); edx = POP32(); ecx = POP32(); eax = POP32(); }"
         if mn == "popfd": return "x2c_setflags(POP32());"
         if mn == "leave": return "esp = ebp; ebp = POP32();"
+        if mn == "enter": return "PUSH32(ebp); ebp = esp; esp -= %d;" % parse_int(ol[0])          # enter n, 0
         if mn == "xchg":
             return "{ %s t_ = %s; %s %s }" % (CTYPE[S], rd(o[0], S), wr(o[0], rd(o[1], S), S), wr(o[1], "t_", S))
         if mn in ("cld",): return "df = 0;"
@@ -650,9 +722,15 @@ class Translator:
 
 
 def main():
-    if len(sys.argv) != 3:
+    args, pkls, mp, rest = sys.argv[1:], [], None, []
+    while args:
+        a = args.pop(0)
+        if a == "--pkl": pkls.append(args.pop(0))
+        elif a == "--map": mp = args.pop(0)
+        else: rest.append(a)
+    if len(rest) != 2:
         print(__doc__); return 2
-    t = Translator(sys.argv[1], sys.argv[2])
+    t = Translator(rest[0], rest[1], pkls or None, mp)
     t.emit_all()
     return 0
 
