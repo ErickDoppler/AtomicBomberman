@@ -96,6 +96,7 @@ static HWND w_CreateWindowExA(DWORD ex, LPCSTR cls, LPCSTR title, DWORD style, i
         guest_call(class_proc, 4, hw, WM_CREATE, 0, cs);
     }
     gfree(cs);
+    post(hw, WM_ACTIVATEAPP, 1, 1); post(hw, WM_ACTIVATE, 1, 0); post(hw, WM_SETFOCUS, 0, 0);   /* the new window is active, as Windows tells it */
     return (HWND)(uintptr_t)hw;
 }
 static BOOL w_UpdateWindow(HWND h) { win_t *w = win_of((uint32_t)(uintptr_t)h); if (w && w->proc) guest_call(w->proc, 4, (uint32_t)(uintptr_t)h, WM_PAINT, 0, 0); return 1; }
@@ -118,16 +119,19 @@ static uint32_t w_DefWindowProcA(HWND h, UINT msg, uint32_t wp, uint32_t lp) {
 
 /* ---------------------------------------------------------------- events -> messages */
 static int shift_down(void) { return vkdown[0x10]; }
+static void di_push(int dik, int down);
 static void key_event(int dik, int down) {
     int vk = dik_to_vk(dik), prev = dikdown[dik & 255];
     uint32_t lp = 1u | ((uint32_t)(dik & 0x7f) << 16) | ((dik & 0x80) ? 1u << 24 : 0) | (down ? (prev ? 1u << 30 : 0) : (1u << 30) | (1u << 31));
     dikdown[dik & 255] = down ? 1 : 0;
+    di_push(dik, down);
     if (vk) {
         if (vk == 0x10 || vk == 0x11 || vk == 0x12) {                    /* both sides of a modifier share one virtual key */
             int other = vk == 0x10 ? (dik == 0x2A ? 0x36 : 0x2A) : vk == 0x11 ? (dik == 0x1D ? 0x9D : 0x1D) : (dik == 0x38 ? 0xB8 : 0x38);
             vkdown[vk] = (uint8_t)(down || dikdown[other]);
         } else vkdown[vk] = down ? 1 : 0;
     }
+    host_log("key dik=%02x vk=%02x down=%d hook=%08x", dik, vk, down, hook_proc);
     if (hook_proc) guest_call(hook_proc, 3, 0, (uint32_t)vk, lp);          /* the game's keyboard hook sees every key first */
     if (!vk) return;
     {   int alt = vkdown[0x12] && !(vk == 0x12);
@@ -168,6 +172,7 @@ static BOOL w_TranslateMessage(const uint32_t *msg) {
     return 0;
 }
 static uint32_t w_DispatchMessageA(const uint32_t *msg) {
+    host_log("dispatch msg=%x wp=%x lp=%x", msg[1], msg[2], msg[3]);
     win_t *w = win_of(msg[0]);
     uint32_t proc = w && w->proc ? w->proc : class_proc;
     return proc ? guest_call(proc, 4, msg[0], msg[1], msg[2], msg[3]) : 0;
@@ -184,13 +189,35 @@ static uint32_t di_ok(void) { return 0; }
 static uint32_t di_addref(uint32_t t) { (void)t; return 1; }
 static uint32_t di_create_device(uint32_t t, uint32_t guid, uint32_t *out, uint32_t outer) { (void)t; (void)guid; (void)outer; *out = dev_obj; host_log("dinput: CreateDevice"); return 0; }
 static uint32_t dev_get_state(uint32_t t, uint32_t cb, uint8_t *data) {
+    host_log("dinput GetDeviceState cb=%u", cb);
     int i; (void)t;
     host_pump();
     for (i = 0; i < (int)cb; i++) data[i] = (uint8_t)(i < 256 && dikdown[i] ? 0x80 : 0);
     return 0;
 }
-static uint32_t dev_get_data(uint32_t t, uint32_t cb, void *d, uint32_t *n, uint32_t flags) { (void)t; (void)cb; (void)d; (void)flags; if (n) *n = 0; return 0; }
-static uint32_t dev_unsupported(uint32_t t) { (void)t; host_log("dinput: unimplemented method"); return 0x80004001u; }
+/* buffered keyboard data (DIDEVICEOBJECTDATA: offset = scan code, data = 0x80 down / 0 up, time stamp, sequence): what the game reads */
+typedef struct { uint32_t ofs, data, time, seq; } didata_t;
+#define DIQ 128
+static didata_t diq[DIQ]; static int diqh, diqt; static uint32_t diseq;
+static void di_push(int dik, int down) {
+    int nx = (diqt + 1) % DIQ;
+    if (nx == diqh) return;
+    diq[diqt].ofs = (uint32_t)dik; diq[diqt].data = down ? 0x80u : 0; diq[diqt].time = (uint32_t)host_ms(); diq[diqt].seq = ++diseq;
+    diqt = nx;
+}
+static uint32_t dev_get_data(uint32_t t, uint32_t cb, void *d, uint32_t *n, uint32_t flags) {
+    uint32_t cnt = 0, max; int h = diqh;
+    (void)t; (void)cb;
+    host_pump();
+    max = n ? *n : 0;
+    if (max == 0xFFFFFFFFu) { diqh = diqt; *n = 0; return 0; }          /* flush */
+    while (h != diqt && cnt < max) { memcpy((uint8_t *)d + cnt * 16, &diq[h], 16); h = (h + 1) % DIQ; cnt++; }
+    if (!(flags & 1)) diqh = h;                                          /* DIGDD_PEEK leaves them in the buffer */
+    if (n) *n = cnt;
+    return 0;
+}
+static uint32_t dev_unsupported(uint32_t t) {
+    host_log("dinput UNSUPPORTED call"); (void)t; host_log("dinput: unimplemented method"); return 0x80004001u; }
 static uint32_t w_DirectInputCreateA(HINSTANCE inst, DWORD ver, uint32_t *out, void *outer) {
     (void)inst; (void)ver; (void)outer;
     *out = di_obj;

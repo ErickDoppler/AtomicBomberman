@@ -10,10 +10,15 @@
 
 /* The guest address space is mapped at the same addresses in the host process (see x2c_main.c): a guest address IS a host pointer. */
 #define GP(a) ((uint8_t *)(uintptr_t)(uint32_t)(a))
-extern uint32_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
-extern uint8_t cf, zf, sf, of, pf, df;
-extern uint64_t mm[8];
-extern uint32_t x2c_fs;                       /* base of the fs segment: the thread information block (exception chain, stack limits) */
+#ifdef X2C_UNITY                               /* one translation unit: the compiler may keep the registers in host registers between calls */
+#define X2C_V static
+#else
+#define X2C_V extern
+#endif
+X2C_V uint32_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
+X2C_V uint8_t cf, zf, sf, of, pf, df;
+X2C_V uint64_t mm[8];
+X2C_V uint32_t x2c_fs;                       /* base of the fs segment: the thread information block (exception chain, stack limits) */
 
 static inline uint8_t rd8(uint32_t a)  { return *GP(a); }
 static inline uint16_t rd16(uint32_t a) { uint16_t v; memcpy(&v, GP(a), 2); return v; }
@@ -34,9 +39,13 @@ void wrf80(uint32_t a, double v);
 #define POP32() (esp += 4, rd32(esp - 4))
 
 /* x87 (double precision) */
-extern double x2c_fst[8];
-extern int x2c_ftop;
+X2C_V double x2c_fst[8];
+X2C_V int x2c_ftop;
+#ifdef X2C_UNITY
+static uint16_t fcw = 0x37f, fsw;
+#else
 extern uint16_t fcw, fsw;
+#endif
 #define st(i) (x2c_fst[(x2c_ftop + (i)) & 7])
 static inline void fpush(double v) { x2c_ftop = (x2c_ftop - 1) & 7; x2c_fst[x2c_ftop] = v; }
 static inline void fpop(void) { x2c_ftop = (x2c_ftop + 1) & 7; }
@@ -66,7 +75,7 @@ void x2c_div0(void);
 #define X2C_FELL(a) x2c_unimpl((a), "fell off the end of the known code")
 #define X2C_STOP(a) x2c_unimpl((a), "int3 / int1")
 #define X2C_DIVCHK(d) do { if (!(d)) x2c_div0(); } while (0)
-#ifdef X2C_CALLS
+#if defined(X2C_CALLS) || defined(X2C_PROF)
 void x2c_enter(uint32_t va);                  /* debugging: log every function entered (build with -DX2C_CALLS) */
 #define X2C_ENTER(a) x2c_enter(a)
 #else

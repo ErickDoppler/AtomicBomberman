@@ -102,6 +102,7 @@ void x2c_host(uint32_t target) {
     if (target >= 0xF1000000u) {
         unsigned k = target - 0xF1000000u;
         if (k >= ndyn) x2c_unimpl(target, "call to an unknown native method");
+        host_log("method %u (argc %d)", k, dyn[k].argc);
         invoke(&dyn[k]);
         return;
     }

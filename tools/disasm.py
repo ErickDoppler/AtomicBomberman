@@ -36,6 +36,9 @@ def gaps_of(insns, lo, hi):
 class Dis:
     def __init__(self):
         self.im = Image(EXE)
+        ref = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "reference", "BM95.EXE")
+        if os.path.exists(ref) and os.path.abspath(ref) != os.path.abspath(EXE):      # raw jump tables of the patched build: see tools/x2c/x2c.py
+            self.im.relocs |= {r for r in Image(ref).relocs if r < 0x4a7000}
         code = self.im.sections[0]
         self.lo, self.hi = code["va"], code["va"] + code["size"]
         if os.environ.get("DIS_LO"):                       # disassemble another code range (the hook section of the patched game)
@@ -68,8 +71,9 @@ class Dis:
                     self.bad.append(a)
                     break
                 i = got[0]
-                overlap = any(self.own[a - self.lo: a - self.lo + i.size])
-                if overlap and not self.allow_overlap:
+                seg = self.own[a - self.lo: a - self.lo + i.size]
+                overlap = any(seg)
+                if overlap and (not self.allow_overlap or any(b not in (0, 1, 2) for b in seg)):   # jump tables are never code; "string" bytes are only a guess (printable runs inside code)
                     self.conflicts.append(a)
                     break
                 if overlap:                                  # a branch lands in the middle of another instruction (Watcom's
@@ -232,7 +236,7 @@ def main():
                     n += 1
                 if n:
                     D.tables.append((t, n))
-                    D.own[t - D.lo: t - D.lo + 4 * n] = b"" * (4 * n)
+                    D.own[t - D.lo: t - D.lo + 4 * n] = bytes([3]) * (4 * n)
                     for k in range(n):
                         D.seed(im.u32(t + 4 * k))
         D.run()
@@ -241,7 +245,7 @@ def main():
             for off, sz in ((d["imm_off"], d["imm_size"]), (d["disp_off"], d["disp_size"])):
                 if off is not None and sz == 4 and (a + off) in im.relocs:
                     v = im.u32(a + off)
-                    if D.lo <= v < D.hi and not D.own[v - D.lo]:
+                    if D.lo <= v < D.hi and not D.own[v - D.lo] and not (d["flow"] == "jmpi" and off == d["disp_off"]):     # a jump table base is data
                         D.seed(v)
         D.run()
         if len(D.insns) == n0:
@@ -256,6 +260,7 @@ def main():
     ks = sorted(insns)
     ov = [(a, b) for a, b in zip(ks, ks[1:]) if a + insns[a]["size"] > b]
     print("conflicts", len(D.conflicts), "tables", len(D.tables), "overlaps", len(ov), [(hex(a), hex(b)) for a, b in ov[:8]])
+    print("conflict addresses", [(hex(x), bytes(D.own[x - D.lo: x - D.lo + 8]).hex()) for x in D.conflicts], D.tables)
     gaps = gaps_of(insns, D.lo, D.hi)
     print("gaps", len(gaps), "bytes", sum(b - a for a, b in gaps))
     for g in sorted(gaps, key=lambda g: g[0] - g[1])[:12]:

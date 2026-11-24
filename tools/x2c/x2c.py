@@ -171,6 +171,10 @@ class Fn:
 class Translator:
     def __init__(self, exe, outdir, pkls=None, mapfile=None):
         self.im = Image(exe)
+
+        ref = os.path.join(HERE, "..", "..", "reference", "BM95.EXE")
+        if os.path.exists(ref) and os.path.abspath(ref) != os.path.abspath(exe):
+            self.im.relocs |= {r for r in Image(ref).relocs if r < 0x4a7000}
         self.out = outdir
         self.d = {}
         for pk in pkls or [os.path.join(HERE, "..", "disasm.pkl")]:
@@ -221,6 +225,12 @@ class Translator:
                             pass                                  # tail call into another function
                         else:
                             fn.labels.add(t); work.append(t)
+                    if i["flow"] == "jmpi" and i["disp_off"] is not None and (a + i["disp_off"]) in im.relocs:
+                        tab = im.u32(a + i["disp_off"])              # a jump table: every entry is code of this function
+                        k = 0
+                        while tab is not None and (tab + 4 * k) in im.relocs and im.u32(tab + 4 * k) in d:
+                            tv = im.u32(tab + 4 * k)
+                            fn.labels.add(tv); work.append(tv); k += 1
                     if i["flow"] in ("ret", "jmp", "jmpi", "stop"):
                         break
                     a += i["size"]
@@ -622,6 +632,12 @@ class Translator:
         }[kind]
         if not rep:
             return body
+        if kind == "movs" and rep in ("rep", "repne", "repnz"):       # the common block copy / fill: one call instead of a loop
+            return ("if (!df && (edi <= esi || edi - esi >= ecx * %d)) { uint32_t n_ = ecx * %d; memmove(GP(edi), GP(esi), n_); esi += n_; edi += n_; ecx = 0; } else " % (sz, sz)) + "while (ecx) { %s ecx--; }" % body
+        if kind == "stos" and rep in ("rep", "repne", "repnz"):
+            if sz == 1:
+                return "if (!df) { memset(GP(edi), (int)(eax & 0xff), ecx); edi += ecx; ecx = 0; } else while (ecx) { %s ecx--; }" % body
+            return "if (!df) { uint32_t n_ = ecx; uint%d_t *q_ = (uint%d_t *)GP(edi); uint%d_t v_ = (uint%d_t)eax; while (n_--) *q_++ = v_; edi += ecx * %d; ecx = 0; } else while (ecx) { %s ecx--; }" % (sz * 8, sz * 8, sz * 8, sz * 8, sz, body)
         cond = ""
         if kind in ("scas", "cmps"):
             cond = " if (%s) break;" % ("!zf" if rep in ("repe", "repz") else "zf")

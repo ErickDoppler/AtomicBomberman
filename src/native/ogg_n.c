@@ -27,7 +27,18 @@ DWORD bm_ogg_pcm_size(const char *path, DWORD fallback) {
 }
 
 #ifdef HAVE_VORBIS
-#include <vorbis/vorbisfile.h>
+/* libvorbisfile without its headers: the functions used, and an opaque buffer for the decoder state (link with
+   -l:libvorbisfile.so.3) */
+typedef int64_t ogg_int64_t;
+typedef struct { char buf[8192] __attribute__((aligned(16))); } OggVorbis_File;
+typedef struct { size_t (*read_func)(void *, size_t, size_t, void *); int (*seek_func)(void *, ogg_int64_t, int);
+                 int (*close_func)(void *); long (*tell_func)(void *); } ov_callbacks;
+typedef struct { int version, channels; long rate, bitrate_upper, bitrate_nominal, bitrate_lower, bitrate_window; void *codec_setup; } vorbis_info;
+int ov_open_callbacks(void *ds, OggVorbis_File *vf, const char *initial, long ibytes, ov_callbacks cb);
+vorbis_info *ov_info(OggVorbis_File *vf, int link);
+ogg_int64_t ov_pcm_total(OggVorbis_File *vf, int link);
+long ov_read(OggVorbis_File *vf, char *buf, int len, int bigendian, int word, int sgned, int *bitstream);
+int ov_clear(OggVorbis_File *vf);
 typedef struct { const unsigned char *p; size_t n, pos; } memsrc_t;
 static size_t cb_read(void *ptr, size_t size, size_t nmemb, void *ds) {
     memsrc_t *m = ds; size_t want = size * nmemb, left = m->n - m->pos;

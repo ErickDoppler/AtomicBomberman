@@ -20,8 +20,11 @@ static unsigned g_frames;
 
 /* ---- the display's refresh imitated: a frame is shown at most every 1/60 s ---- */
 static void pace(void) {
-    static double next;
+    static double next; static int nopace = -1; static uint64_t t0; static unsigned n;
     double now = (double)host_ms();
+    if (nopace < 0) nopace = getenv("BM_NOPACE") != 0;
+    if (getenv("BM_FPS")) { if (!t0) t0 = host_ms(); if (++n % 120 == 0) { fprintf(stderr, "fps %.1f\n", 120000.0 / (double)(host_ms() - t0)); t0 = host_ms(); } }
+    if (nopace) return;
     if (next == 0) next = now;
     if (now < next) { while (now < next - 1) { host_pump(); sys_sleep((unsigned)(next - now - 1)); now = (double)host_ms(); } while ((double)host_ms() < next) {} }
     next += 1000.0 / 60.0;
@@ -32,7 +35,9 @@ static void pace(void) {
 static void shot(void) {
     const char *path = getenv("BM_SHOT"); FILE *f; unsigned char hdr[54]; int y, i;
     unsigned size = 14 + 40 + 1024 + (unsigned)(g_w * g_h);
+    char name[512];
     if (!path) return;
+    if (strchr(path, 37)) { snprintf(name, sizeof name, path, g_frames); path = name; }       /* a %d in the name: one file per dumped frame */
     f = fopen(path, "wb");
     if (!f) return;
     memset(hdr, 0, sizeof hdr);
