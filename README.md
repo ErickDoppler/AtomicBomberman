@@ -186,6 +186,17 @@ python tests\build_nettest.py    -> two-process TCP test (see tests\nettest.c)
 python tests\build_vfstest.py    -> asset conversion test against the original files
 ```
 
+## Linux (portable build)
+`distlinux86/` builds the game for Linux (x86-64; the same sources build on ARM, e.g. Raspberry Pi OS). The restored program is
+translated to C (`tools/x2c`, a static x86 -> C translator; the translated source is in `distlinux86/source/gen`), run on a small host
+(`src/native`) that replaces the Windows API (files, window and messages, DirectDraw / DirectInput / DirectSound, sockets) with SDL2 and
+POSIX, together with the unchanged platform layer (`src/platform`). `distlinux86/build.sh` builds it and creates
+`atomicbomberman/` with `AtomicBomberman.sh`, the program and `DATA/` (the sound libraries are in `DATA/lib`).
+Needs gcc and SDL2 (`sudo apt install gcc libsdl2-2.0-0`), and your own game data (see `distlinux86/README-FIRST.txt`).
+Tested: main menu, single player, sound and the network lobby on x86-64 Linux; single player on a Raspberry Pi 4
+(aarch64, SDL2 / Wayland). **Not verified:** a complete network match between two machines on Linux, and play with Windows
+players; on the Raspberry Pi the game is too slow for comfortable play.
+
 ## Not done / not verified
 
 * Not tested on Windows 7, 8 or 11 (only on Windows 10); the manifest and compat-layer logic
