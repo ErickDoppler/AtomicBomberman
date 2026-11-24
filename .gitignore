@@ -14,6 +14,7 @@
 *.log
 *.bmp
 *.png
+!/docs/screenshots/*.png
 *.pyc
 __pycache__/
 DedicatedServer/server.log

@@ -191,7 +191,10 @@ static void present(void) {
     u.SetStretchBltMode(dc, COLORONCOLOR);
     u.StretchDIBits(dc, dx, dy, dw, dh, 0, 0, g_w, g_h, g_pix, (const BITMAPINFO *)&g_bmi, DIB_RGB_COLORS, SRCCOPY);
     u.ReleaseDC(g_wnd, dc);
-    if (++g_frames % 30 == 0) { shot(); bm_log("ddraw: frame %d", (int)g_frames); }
+    {   static unsigned every;                                   /* BM_SHOT_EVERY=<n>: dump every n-th frame (default 30; 1 for screens that draw rarely) */
+        if (!every) { char e[16]; every = u.GetEnvironmentVariableA("BM_SHOT_EVERY", e, sizeof e) && bm_atoi(e) > 0 ? (unsigned)bm_atoi(e) : 30; }
+        if (++g_frames % every == 0) { shot(); if (every >= 30) bm_log("ddraw: frame %d", (int)g_frames); }
+    }
 }
 
 /* ---- IUnknown-ish helpers ---- */

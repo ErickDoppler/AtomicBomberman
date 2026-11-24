@@ -21,6 +21,53 @@ to PNG / Ogg Vorbis.  It needs a legitimate copy of the game to convert the asse
 | network | IPX / modem / serial | **TCP** (host on a port, or join IP:port) + modem / serial |
 | Windows | crashes on current Windows (see below) | starts from any folder, Win 7 – 11 |
 
+## Screenshots
+Frames of the running game (the artwork belongs to the original authors, see the credits above).
+
+| Main menu | About |
+|---|---|
+| ![Main menu](docs/screenshots/main-menu.png) | ![About](docs/screenshots/about.png) |
+
+| Start Network Game: the server lobby | Join Network Game |
+|---|---|
+| ![Server lobby](docs/screenshots/server-lobby.png) | ![Join screen](docs/screenshots/join-screen.png) |
+
+In the server lobby the TCP port is at the top (type to change it, Enter applies it), the players that have connected are
+listed, and any player can press *Start Game*. On the join screen the server address and port are edited in place (a
+blinking `_` shows which field you are in); Enter moves on, *Join* connects.
+
+## Dedicated server
+A server that has **no player of its own** and takes up to 10 players. It is a small Python program
+(`DedicatedServer/`, standard library only, Python 3.7+) that runs on Windows, Linux, macOS and Raspberry Pi.
+
+**Install and start**
+
+| System | Install what is needed | Start |
+|---|---|---|
+| Windows | `DedicatedServer\setup.cmd` (installs Python if it is missing) | `DedicatedServer\start.cmd` |
+| Linux / Raspberry Pi / macOS | `./setup.sh` (installs Python 3 with the system package manager if missing) | `./start.sh` |
+| Linux, always on (systemd) | `sudo ./install_service.sh` | starts at boot, restarts if it stops; remove with `sudo ./uninstall_service.sh` |
+
+**Settings** are in `DedicatedServer/server.ini` (restart the server after editing it):
+
+```ini
+[server]
+name = Atomic Bomberman Dedicated Server   ; shown in the server log
+port = 5000                                ; TCP port the players connect to
+bind = 0.0.0.0                             ; listen on every network interface
+max_players = 10                           ; 1 - 10
+fuse_seconds = 4                           ; a player silent for this long is dropped
+log_file = server.log                      ; empty = console only
+```
+
+**Play through it**
+1. Start the server and open the TCP port (`port` in `server.ini`) in the firewall / router if players connect from outside your network.
+2. Every player starts the game and chooses **Join Network Game**, types the server's address and port, and presses **Join**. Nobody uses *Start Network Game*.
+3. All players see the same lobby. Any player can press **Start Game**; then everyone lands on the player setup screen, presses **Enter** to lock their position, and the match starts when everyone has locked.
+4. The first player to connect (node 1) runs the game's server logic on their computer; if that player leaves during a game, everybody returns to the join screen. When the last player leaves the server is empty and ready again.
+
+**Check it** with `python DedicatedServer/tests/selftest.py` (fake players against a real server process). More details: [DedicatedServer/README.md](DedicatedServer/README.md).
+
 ## Play
 
 ```
